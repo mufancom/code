@@ -1,3 +1,5 @@
+import {Dict} from 'tslang';
+
 let plugins = [
   '@mufan/eslint-plugin',
   '@typescript-eslint',
@@ -7,11 +9,18 @@ let plugins = [
   'react-hooks',
 ];
 
-if (
-  require.main &&
-  /[\\/]\.vscode(?:-server)?[\\/]extensions[\\/]/.test(require.main.filename)
-) {
-  plugins.push('only-warn');
+let additionRules: Dict<string> = {};
+
+if (require.main) {
+  if (
+    /[\\/]\.vscode(?:-server)?[\\/]extensions[\\/]/.test(require.main.filename)
+  ) {
+    plugins.push('only-warn');
+  }
+
+  if (require.main.filename.includes('eslint/bin/eslint.js')) {
+    additionRules['@mufan/import-type-unification'] = 'error';
+  }
 }
 
 export const defaultConfig = {
@@ -28,6 +37,7 @@ export const defaultConfig = {
   plugins,
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    ...additionRules,
     '@mufan/empty-line-around-blocks': 'error',
     '@mufan/import-groups': [
       'error',
