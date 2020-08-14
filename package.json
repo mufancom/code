@@ -1,0 +1,14 @@
+{
+  "name": "mufan-code",
+  "private": true,
+  "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "workspaces": [
+    "packages/code",
+    "packages/eslint-plugin"
+  ],
+  "devDependencies": {
+    "eslint": "^7.6.0",
+    "prettier": "^2.0.5"
+  }
+}
