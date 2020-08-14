@@ -1,16 +1,13 @@
 {
-  "name": "magicspace",
+  "name": "mufan-code",
   "private": true,
-  "repository": "https://github.com/makeflow/magicspace.git",
+  "repository": "https://github.com/makeflow/mufan-code.git",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
   "scripts": {
     "lerna:publish": "lerna publish --registry=https://registry.npmjs.org",
-    "test": "yarn test:eslint-plugin && yarn test:core && yarn test:templates && yarn test:cli",
-    "test:eslint-plugin": "yarn workspace @magicspace/eslint-plugin test",
-    "test:core": "yarn workspace @magicspace/core test",
-    "test:templates": "yarn workspace @magicspace/templates test",
-    "test:cli": "yarn workspace magicspace test"
+    "test": "yarn test:eslint-plugin",
+    "test:eslint-plugin": "yarn workspace @mufan/eslint-plugin test"
   },
   "devDependencies": {
     "@types/eslint": "^7.2.0",
@@ -28,10 +25,7 @@
     "typescript": "^3.9.5"
   },
   "workspaces": [
-    "packages/cli",
-    "packages/configs",
-    "packages/core",
-    "packages/templates",
+    "packages/code",
     "packages/eslint-plugin"
   ]
 }

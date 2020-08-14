@@ -1,4 +1,9 @@
-let plugins = ['@magicspace', '@typescript-eslint', 'import', 'no-null'];
+let plugins = [
+  '@mufan/eslint-plugin',
+  '@typescript-eslint',
+  'import',
+  'no-null',
+];
 
 if (
   require.main &&
@@ -21,8 +26,8 @@ export const defaultConfig = {
   plugins,
   ignorePatterns: ['.eslintrc.js'],
   rules: {
-    '@magicspace/empty-line-around-blocks': 'error',
-    '@magicspace/import-groups': [
+    '@mufan/empty-line-around-blocks': 'error',
+    '@mufan/import-groups': [
       'error',
       {
         groups: [
@@ -70,12 +75,12 @@ export const defaultConfig = {
         ordered: true,
       },
     ],
-    '@magicspace/import-path-be-smart': 'error',
-    '@magicspace/import-path-no-parent': 'error',
-    '@magicspace/import-path-shallowest': 'off',
-    '@magicspace/import-path-strict-hierarchy': 'off',
-    '@magicspace/no-empty-constructor': 'error',
-    '@magicspace/ordered-imports': [
+    '@mufan/import-path-be-smart': 'error',
+    '@mufan/import-path-no-parent': 'error',
+    '@mufan/import-path-shallowest': 'off',
+    '@mufan/import-path-strict-hierarchy': 'off',
+    '@mufan/no-empty-constructor': 'error',
+    '@mufan/ordered-imports': [
       'error',
       {
         'import-sources-order': 'case-insensitive',
@@ -83,7 +88,7 @@ export const defaultConfig = {
         'module-source-path': 'full',
       },
     ],
-    '@magicspace/scoped-modules': 'error',
+    '@mufan/scoped-modules': 'error',
     '@typescript-eslint/explicit-member-accessibility': 'off',
     '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/no-for-in-array': 'error',
@@ -401,10 +406,10 @@ export const defaultConfig = {
     {
       files: ['*.ts', '*.tsx'],
       rules: {
-        '@magicspace/explicit-return-type': 'error',
-        '@magicspace/import-path-base-url': 'off',
-        '@magicspace/no-unnecessary-type-assertion': 'error',
-        '@magicspace/strict-key-order': 'error',
+        '@mufan/explicit-return-type': 'error',
+        '@mufan/import-path-base-url': 'off',
+        '@mufan/no-unnecessary-type-assertion': 'error',
+        '@mufan/strict-key-order': 'error',
         '@typescript-eslint/adjacent-overload-signatures': 'error',
         '@typescript-eslint/array-type': [
           'error',

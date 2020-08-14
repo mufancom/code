@@ -1,15 +1,16 @@
 {
-  "name": "@magicspace/eslint-plugin",
+  "name": "@mufan/eslint-plugin",
   "version": "0.1.32",
-  "description": "Custom ESLint rules for MagicSpace.",
-  "repository": "https://github.com/makeflow/magicspace.git",
+  "description": "Custom ESLint rules for Mufan Code.",
+  "repository": "https://github.com/makeflow/mufan-code.git",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
   "keywords": [
-    "eslint"
+    "eslint",
+    "eslintplugin"
   ],
   "main": "bld/index.js",
   "scripts": {

@@ -1,4 +1,4 @@
-// eslint-disable-next-line @magicspace/import-groups
+// eslint-disable-next-line @mufan/import-groups
 import {rules} from '../rules';
 
 import {RuleTester} from './@utils';
