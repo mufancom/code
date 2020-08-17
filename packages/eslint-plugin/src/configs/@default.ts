@@ -525,14 +525,7 @@ export const defaultConfig = {
         '@typescript-eslint/require-await': 'off',
         '@typescript-eslint/restrict-plus-operands': 'off',
         '@typescript-eslint/strict-boolean-expressions': 'off',
-        '@typescript-eslint/triple-slash-reference': [
-          'error',
-          {
-            path: 'never',
-            types: 'never',
-            lib: 'never',
-          },
-        ],
+        '@typescript-eslint/triple-slash-reference': 'off',
         '@typescript-eslint/typedef': 'off',
         '@typescript-eslint/unbound-method': 'off',
         '@typescript-eslint/unified-signatures': 'error',
