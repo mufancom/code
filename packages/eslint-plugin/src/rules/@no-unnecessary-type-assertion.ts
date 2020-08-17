@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-import {TSESLint} from '@typescript-eslint/experimental-utils';
-import {ReportFixFunction} from '@typescript-eslint/experimental-utils/dist/ts-eslint';
 import {isObjectFlagSet, isObjectType, isTypeFlagSet} from 'tsutils';
 import * as ts from 'typescript';
 
@@ -43,7 +41,6 @@ export const noUnnecessaryTypeAssertionRule = createRule<Options, MessageId>({
       recommended: 'error',
     },
     messages,
-    fixable: 'code',
     schema: [
       {
         type: 'array',
@@ -92,17 +89,9 @@ export const noUnnecessaryTypeAssertionRule = createRule<Options, MessageId>({
         const type = this.checker.getTypeAtLocation(node.expression);
 
         if (type === this.checker.getNonNullableType(type)) {
-          let fix: ReportFixFunction | undefined;
-
-          if (this.checker.typeToString(type) !== 'any') {
-            fix = (fixer: TSESLint.RuleFixer) =>
-              fixer.replaceTextRange([node.expression.end, node.end], '');
-          }
-
           context.report({
             node: parserServices.tsNodeToESTreeNodeMap.get(node),
             messageId: 'unnecessaryAssertion',
-            fix,
           });
         }
       }
@@ -127,17 +116,13 @@ export const noUnnecessaryTypeAssertionRule = createRule<Options, MessageId>({
 
         const uncastType = this.checker.getTypeAtLocation(node.expression);
 
-        if (uncastType === castType) {
+        if (
+          uncastType === castType &&
+          this.checker.typeToString(uncastType) !== 'any'
+        ) {
           context.report({
             node: parserServices.tsNodeToESTreeNodeMap.get(node),
             messageId: 'unnecessaryAssertion',
-            fix: fixer =>
-              node.kind === ts.SyntaxKind.TypeAssertionExpression
-                ? fixer.replaceTextRange(
-                    [node.getStart(), node.expression.getStart()],
-                    '',
-                  )
-                : fixer.replaceTextRange([node.expression.end, node.end], ''),
           });
         }
       }
