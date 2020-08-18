@@ -327,7 +327,13 @@ export const defaultConfig = {
     'no-useless-concat': 'off',
     'no-useless-constructor': 'off',
     'no-useless-escape': 'off',
-    'no-useless-rename': 'off',
+    'no-useless-rename': [
+      'error',
+      {
+        ignoreImport: true,
+        ignoreExport: true,
+      },
+    ],
     'no-useless-return': 'off',
     'no-var': 'error',
     'no-void': 'off',
