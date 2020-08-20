@@ -1,0 +1,15 @@
+{
+  "name": "@mufan/code",
+  "version": "0.2.5",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "Custom Project Configuration Files.",
+  "keywords": [
+    "TypeScript",
+    "prettier"
+  ],
+  "repository": "https://github.com/makeflow/mufan-code.git",
+  "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd."
+}

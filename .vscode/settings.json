@@ -2,18 +2,23 @@
   "[plaintext]": {
     "files.insertFinalNewline": false
   },
-  "editor.formatOnSave": true,
-  "editor.insertSpaces": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll": true
-  },
-  "editor.codeActionsOnSaveTimeout": 10000,
   "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "editor.rulers": [80],
   "files.eol": "\n",
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.enable": true,
-  "eslint.validate": ["javascript", "typescript"],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
   "eslint.workingDirectories": [{"mode": "auto"}]
 }

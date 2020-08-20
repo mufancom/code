@@ -1,14 +1,13 @@
-# @magicspace/eslint-plugin
+# @mufan/eslint-plugin
 
-- `plugin:@magicspace/default`
-- `plugin:@magicspace/override-dev`
+- `plugin:@mufan/default`
 
 ## 安装
 
 使用下面的命令来进行安装
 
 ```
-yarn add @magicspace/configs @magicspace/eslint-plugin --dev
+yarn add @mufan/configs @mufan/eslint-plugin --dev
 ```
 
 ## 使用
@@ -17,7 +16,7 @@ yarn add @magicspace/configs @magicspace/eslint-plugin --dev
 
 ```js
 module.exports = {
-  extends: ['plugin:@magicspace/default', 'plugin:@magicspace/override-dev'],
+  extends: ['plugin:@mufan/default'],
   parserOptions: {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,
@@ -42,7 +41,7 @@ module.exports = {
 
 ## 规则
 
-魔法空格里面集成了一些规则可以提供一些风格层面的检查工作。
+此项目里集成了一些规则可以提供一些风格层面的检查工作。
 
 ### Import-Groups
 

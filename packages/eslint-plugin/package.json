@@ -1,29 +1,30 @@
 {
-  "name": "@magicspace/eslint-plugin",
+  "name": "@mufan/eslint-plugin",
   "version": "0.1.32",
-  "description": "Custom ESLint rules for MagicSpace.",
-  "repository": "https://github.com/makeflow/magicspace.git",
-  "author": "Chengdu Mufan Technology Co., Ltd.",
-  "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
+  "description": "Custom ESLint rules for Mufan Code.",
   "keywords": [
-    "eslint"
+    "eslint",
+    "eslintplugin"
   ],
+  "repository": "https://github.com/makeflow/mufan-code.git",
+  "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
   "main": "bld/index.js",
-  "scripts": {
-    "lint": "eslint ./src --ext .ts",
-    "bare-test": "mocha ./bld/tests/*.js -t 5000",
-    "build": "rimraf bld && tsc --project src/tsconfig.json",
-    "test": "yarn build && yarn bare-test"
-  },
   "files": [
     "src",
     "!src/tests",
     "bld",
     "!bld/tests"
   ],
+  "scripts": {
+    "lint": "eslint ./src --ext .ts",
+    "bare-test": "mocha ./bld/tests/*.js -t 5000",
+    "build": "rimraf bld && tsc --project src/tsconfig.json",
+    "test": "yarn build && yarn bare-test"
+  },
   "devDependencies": {
     "@types/diff": "^4.0.2",
     "mocha": "^8.0.1",
