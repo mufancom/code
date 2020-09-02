@@ -37,10 +37,6 @@ ruleTester.run(RULE_NAME, rules[RULE_NAME], {
         'invalid/noStrictNullChecks/test.ts',
       ),
       errors: [{messageId: 'unnecessaryAssertion', line: 5}],
-      output: getTestFileContent(
-        TEST_DIR_PATH,
-        'invalid/noStrictNullChecks/test.ts.fix',
-      ),
     },
     {
       parserOptions: {
@@ -52,7 +48,6 @@ ruleTester.run(RULE_NAME, rules[RULE_NAME], {
       options: [['AnyDuringMigration']],
       code: getTestFileContent(TEST_DIR_PATH, 'invalid/strict/test.ts'),
       filename: getTestFileFullPath(TEST_DIR_PATH, 'invalid/strict/test.ts'),
-      output: getTestFileContent(TEST_DIR_PATH, 'invalid/strict/test.ts.fix'),
       errors: [
         {messageId: 'unnecessaryAssertion', line: 9},
         {messageId: 'unnecessaryAssertion', line: 10},
@@ -93,10 +88,6 @@ ruleTester.run(RULE_NAME, rules[RULE_NAME], {
       filename: getTestFileFullPath(
         TEST_DIR_PATH,
         'invalid/strictNullChecks/test.ts',
-      ),
-      output: getTestFileContent(
-        TEST_DIR_PATH,
-        'invalid/strictNullChecks/test.ts.fix',
       ),
       errors: [
         {messageId: 'unnecessaryAssertion', line: 9},
