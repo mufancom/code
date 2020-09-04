@@ -1,6 +1,6 @@
 {
   "name": "@mufan/eslint-plugin",
-  "version": "0.1.32",
+  "version": "0.1.34",
   "publishConfig": {
     "access": "public"
   },
@@ -42,6 +42,7 @@
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-no-null": "^1.0.2",
     "eslint-plugin-only-warn": "^1.0.2",
+    "eslint-plugin-react": "^7.20.6",
     "lodash": "^4.17.15",
     "module-lens": "^0.1.3",
     "tslang": "^0.1.22",

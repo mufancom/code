@@ -3,6 +3,7 @@ let plugins = [
   '@typescript-eslint',
   'import',
   'no-null',
+  'react',
 ];
 
 if (
@@ -359,6 +360,13 @@ export const defaultConfig = {
     'quote-props': 'off',
     quotes: 'off',
     radix: 'off',
+    'react/self-closing-comp': [
+      'error',
+      {
+        component: true,
+        html: true,
+      },
+    ],
     'require-atomic-updates': 'off',
     'require-await': 'off',
     'require-unicode-regexp': 'off',
