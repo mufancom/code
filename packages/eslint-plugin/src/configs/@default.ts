@@ -4,6 +4,7 @@ let plugins = [
   'import',
   'no-null',
   'react',
+  'react-hooks',
 ];
 
 if (
@@ -366,6 +367,8 @@ export const defaultConfig = {
     'quote-props': 'off',
     quotes: 'off',
     radix: 'off',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'error',
     'react/self-closing-comp': [
       'error',
       {
