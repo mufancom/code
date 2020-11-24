@@ -79,7 +79,7 @@ export const defaultConfig = {
     ],
     '@mufan/import-path-be-smart': 'error',
     '@mufan/import-path-no-parent': 'error',
-    '@mufan/import-path-shallowest': 'off',
+    '@mufan/import-path-shallowest': 'error',
     '@mufan/import-path-strict-hierarchy': 'off',
     '@mufan/no-empty-constructor': 'error',
     '@mufan/ordered-imports': [
