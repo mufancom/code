@@ -1,4 +1,4 @@
-import * as FS from 'fs';
+import FS from 'fs';
 
 export function gentleStat(path: string): FS.Stats | undefined {
   try {

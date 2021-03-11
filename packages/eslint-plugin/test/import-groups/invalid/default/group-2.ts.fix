@@ -1,6 +1,6 @@
-import * as fs from 'fs'
+import FS from 'fs'
 // comment1
-import * as path from 'path'
+import Path from 'path'
 
 // comment2
 import * as eslint from 'eslint'

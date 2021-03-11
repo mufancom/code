@@ -25,7 +25,7 @@ import {
   isNamedImports,
   isStringLiteral,
 } from 'tsutils';
-import * as ts from 'typescript';
+import TypeScript from 'typescript';
 
 import {createRule, getParserServices} from './@utils';
 
@@ -166,7 +166,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       [
         'basename',
         x => {
-          if (!ts.isExternalModuleNameRelative(x)) {
+          if (!TypeScript.isExternalModuleNameRelative(x)) {
             return x;
           }
 
@@ -279,7 +279,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       };
 
       constructor(
-        readonly sourceFile: ts.SourceFile,
+        readonly sourceFile: TypeScript.SourceFile,
         readonly options: ConvertedOptions,
       ) {}
 
@@ -287,7 +287,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
         return this.importsBlocks[this.importsBlocks.length - 1];
       }
 
-      walk(sourceFile: ts.SourceFile): void {
+      walk(sourceFile: TypeScript.SourceFile): void {
         // Walk through all statements checking import statements
         // and building up ImportsBlocks along the way (with replacements)
         for (const statement of sourceFile.statements) {
@@ -302,7 +302,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
         }
       }
 
-      private checkStatement(statement: ts.Statement): void {
+      private checkStatement(statement: TypeScript.Statement): void {
         if (
           !(
             isImportDeclaration(statement) ||
@@ -335,7 +335,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
         }
       }
 
-      private checkImportDeclaration(node: ts.ImportDeclaration): void {
+      private checkImportDeclaration(node: TypeScript.ImportDeclaration): void {
         // ex:  import {name1, name2 } from 'import/path';
         if (!isStringLiteral(node.moduleSpecifier)) {
           // Ignore grammar error
@@ -358,7 +358,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       }
 
       private checkImportEqualsDeclaration(
-        node: ts.ImportEqualsDeclaration,
+        node: TypeScript.ImportEqualsDeclaration,
       ): void {
         // only allowed `import x = require('y');`
 
@@ -437,7 +437,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
        * If not, adds a failure and updates import blocks with correct order
        * for replacement.
        */
-      private checkNamedImports(node: ts.NamedImports): void {
+      private checkNamedImports(node: TypeScript.NamedImports): void {
         const imports = node.elements;
 
         const pair = findUnsortedPair(
@@ -645,13 +645,13 @@ export const orderedImportsRule = createRule<Options, MessageId>({
           }
         }
 
-        return newLine === undefined ? ts.sys.newLine : newLine;
+        return newLine === undefined ? TypeScript.sys.newLine : newLine;
       }
     }
 
     interface ImportDeclaration {
       /** node with details of the import */
-      node: ts.ImportDeclaration | ts.ImportEqualsDeclaration;
+      node: TypeScript.ImportDeclaration | TypeScript.ImportEqualsDeclaration;
       /** end position of node within source file */
       nodeEndOffset: number;
       /** start position of node within source file */
@@ -675,7 +675,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
        * Add a new import declaration to the block
        */
       addImportDeclaration(
-        sourceFile: ts.SourceFile,
+        sourceFile: TypeScript.SourceFile,
         node: ImportDeclaration['node'],
         importPath: string,
         group: GroupOption,
@@ -773,7 +773,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
 
       // gets the offset of the end of the import's line, including newline, to include comment to the right
       private getEndOffset(
-        sourceFile: ts.SourceFile,
+        sourceFile: TypeScript.SourceFile,
         node: ImportDeclaration['node'],
       ): number {
         return sourceFile.text.indexOf('\n', node.end) + 1;
@@ -802,9 +802,9 @@ export const orderedImportsRule = createRule<Options, MessageId>({
     // After applying a transformation, are the nodes sorted according to the text they contain?
     // If not, return the pair of nodes which are out of order.
     function findUnsortedPair(
-      xs: readonly ts.Node[],
+      xs: readonly TypeScript.Node[],
       transform: (x: string) => string,
-    ): [ts.Node, ts.Node] | undefined {
+    ): [TypeScript.Node, TypeScript.Node] | undefined {
       for (let i = 1; i < xs.length; i++) {
         if (transform(xs[i].getText()) < transform(xs[i - 1].getText())) {
           return [xs[i - 1], xs[i]];
@@ -856,18 +856,19 @@ export const orderedImportsRule = createRule<Options, MessageId>({
     }
 
     function moduleDeclarationBody(
-      node: ts.ModuleDeclaration,
-    ): ts.ModuleBlock | undefined {
+      node: TypeScript.ModuleDeclaration,
+    ): TypeScript.ModuleBlock | undefined {
       let body = node.body;
 
       while (
         body !== undefined &&
-        body.kind === ts.SyntaxKind.ModuleDeclaration
+        body.kind === TypeScript.SyntaxKind.ModuleDeclaration
       ) {
         body = body.body;
       }
 
-      return body !== undefined && body.kind === ts.SyntaxKind.ModuleBlock
+      return body !== undefined &&
+        body.kind === TypeScript.SyntaxKind.ModuleBlock
         ? body
         : undefined;
     }
@@ -878,9 +879,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       context.getSourceCode().ast,
     );
 
-    new Walker(sourceFile, parseOptions(options)).walk(
-      sourceFile,
-    );
+    new Walker(sourceFile, parseOptions(options)).walk(sourceFile);
 
     for (let reportDescriptor of reportDescriptors) {
       if (reportDescriptor.node) {

@@ -17,7 +17,7 @@
  */
 
 import {isObjectFlagSet, isObjectType, isTypeFlagSet} from 'tsutils';
-import * as ts from 'typescript';
+import TypeScript from 'typescript';
 
 import {createRule, getParserServices} from './@utils';
 
@@ -59,33 +59,35 @@ export const noUnnecessaryTypeAssertionRule = createRule<Options, MessageId>({
   create(context, [options]) {
     class Walker {
       constructor(
-        private sourceFile: ts.SourceFile,
+        private sourceFile: TypeScript.SourceFile,
         private options: string[],
-        private readonly checker: ts.TypeChecker,
+        private readonly checker: TypeScript.TypeChecker,
         private readonly strictNullChecks: boolean,
       ) {}
 
       walk(): void {
-        const cb = (node: ts.Node): void => {
+        const cb = (node: TypeScript.Node): void => {
           switch (node.kind) {
-            case ts.SyntaxKind.NonNullExpression:
+            case TypeScript.SyntaxKind.NonNullExpression:
               if (this.strictNullChecks) {
-                this.checkNonNullAssertion(node as ts.NonNullExpression);
+                this.checkNonNullAssertion(
+                  node as TypeScript.NonNullExpression,
+                );
               }
 
               break;
-            case ts.SyntaxKind.TypeAssertionExpression:
-            case ts.SyntaxKind.AsExpression:
-              this.verifyCast(node as ts.AssertionExpression);
+            case TypeScript.SyntaxKind.TypeAssertionExpression:
+            case TypeScript.SyntaxKind.AsExpression:
+              this.verifyCast(node as TypeScript.AssertionExpression);
           }
 
-          return ts.forEachChild(node, cb);
+          return TypeScript.forEachChild(node, cb);
         };
 
-        return ts.forEachChild(this.sourceFile, cb);
+        return TypeScript.forEachChild(this.sourceFile, cb);
       }
 
-      private checkNonNullAssertion(node: ts.NonNullExpression): void {
+      private checkNonNullAssertion(node: TypeScript.NonNullExpression): void {
         const type = this.checker.getTypeAtLocation(node.expression);
 
         if (type === this.checker.getNonNullableType(type)) {
@@ -96,7 +98,7 @@ export const noUnnecessaryTypeAssertionRule = createRule<Options, MessageId>({
         }
       }
 
-      private verifyCast(node: ts.AssertionExpression): void {
+      private verifyCast(node: TypeScript.AssertionExpression): void {
         if (this.options.indexOf(node.type.getText(this.sourceFile)) !== -1) {
           return;
         }
@@ -104,9 +106,9 @@ export const noUnnecessaryTypeAssertionRule = createRule<Options, MessageId>({
         const castType = this.checker.getTypeAtLocation(node);
 
         if (
-          isTypeFlagSet(castType, ts.TypeFlags.Literal) ||
+          isTypeFlagSet(castType, TypeScript.TypeFlags.Literal) ||
           (isObjectType(castType) &&
-            (isObjectFlagSet(castType, ts.ObjectFlags.Tuple) ||
+            (isObjectFlagSet(castType, TypeScript.ObjectFlags.Tuple) ||
               couldBeTupleType(castType)))
         ) {
           // It's not always safe to remove a cast to a literal type or tuple
@@ -132,7 +134,7 @@ export const noUnnecessaryTypeAssertionRule = createRule<Options, MessageId>({
      * Sometimes tuple types don't have ObjectFlags.Tuple set, like when they're being matched against an inferred type.
      * So, in addition, check if there are integer properties 0..n and no other numeric keys
      */
-    function couldBeTupleType(type: ts.ObjectType): boolean {
+    function couldBeTupleType(type: TypeScript.ObjectType): boolean {
       const properties = type.getProperties();
 
       if (properties.length === 0) {

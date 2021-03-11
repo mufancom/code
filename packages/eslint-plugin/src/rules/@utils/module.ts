@@ -1,4 +1,4 @@
-import * as Path from 'path';
+import Path from 'path';
 
 import {TSESLint, TSESTree} from '@typescript-eslint/experimental-utils';
 import _ from 'lodash';

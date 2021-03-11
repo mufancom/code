@@ -1,5 +1,5 @@
 import {TSESTree} from '@typescript-eslint/experimental-utils';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import {resolveWithCategory} from 'module-lens';
 
 import {RequiredParserServices, createRule} from './@utils';
