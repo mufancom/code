@@ -4,23 +4,34 @@ import {resolveWithCategory} from 'module-lens';
 
 import {RequiredParserServices, createRule} from './@utils';
 
+/*
+  TODO
+
+  1. Improve readability of importTypeNotUnifiedPreviously
+  2. Use different message id to distinction quick config naming type issue
+*/
+
 type ImportType = 'default' | 'namespace' | 'named' | 'equals';
 
 const IMPORT_TYPES = ['default', 'namespace', 'named', 'equals'];
 
 interface ImportInfo {
   importType: ImportType;
-  identifier: TSESTree.Identifier;
+  localIdentifier: TSESTree.Identifier;
+  /**
+   * Available on named import
+   */
+  importedIdentifier: TSESTree.Identifier | undefined;
 }
 
-interface ReportNeededInfo {
+interface ImportIdentifyInfo {
   importType: ImportType;
   identifier: TSESTree.Identifier;
   filename: string;
 }
 
 interface ReportInfo {
-  reportNeededInfos: ReportNeededInfo[] | undefined;
+  importIdentifyInfos: ImportIdentifyInfo[] | undefined;
   reportedImportTypeSet?: Set<ImportType>;
   reported: boolean;
 }
@@ -52,9 +63,46 @@ interface AllowConfigurationObject {
   identifiers: '*' | 'identical' | string[];
 }
 
+type QuickConfigImportNamingType = 'as-is' | 'as-is-with-underscore' | 'any';
+const QUICK_CONFIG_IMPORT_NAMING_TYPE = [
+  'as-is',
+  'as-is-with-underscore',
+  'any',
+];
+
+interface QuickConfigOptions {
+  /**
+   * Module name or path to apply config
+   */
+  modules: string[];
+  /**
+   * Allow default and named import appear at same time
+   */
+  allowDefaultAndNamedImport: boolean;
+  /**
+   * Naming type of default import, example:
+   * A module named 'foobar', then:
+   *
+   * as-is: foobar and FooBar or fooBar was allowed
+   *
+   * as-is-with-underscore: all name in 'as-is' plus '_foobar'
+   *
+   * any: no limitation at all
+   */
+  defaultImportNamingType?: QuickConfigImportNamingType;
+  /**
+   * Naming type of named import
+   *
+   * Same as default import naming type, but the name will be compare with it's
+   * origin export name rather than module name
+   */
+  namedImportNamingType?: QuickConfigImportNamingType;
+}
+
 type Options = [
   {
-    except?: {
+    quickConfigs?: QuickConfigOptions[];
+    configs?: {
       module: string;
       allow: (ImportType | AllowConfigurationObject)[];
     }[];
@@ -76,7 +124,30 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       {
         type: 'object',
         properties: {
-          except: {
+          quickConfigs: {
+            type: 'array',
+            items: {
+              type: 'object',
+              required: ['modules', 'allowDefaultAndNamedImport'],
+              properties: {
+                modules: {
+                  type: 'array',
+                },
+                allowDefaultAndNamedImport: {
+                  type: 'boolean',
+                },
+                defaultImportNamingType: {
+                  type: 'string',
+                  enum: QUICK_CONFIG_IMPORT_NAMING_TYPE,
+                },
+                namedImportNamingType: {
+                  type: 'string',
+                  enum: QUICK_CONFIG_IMPORT_NAMING_TYPE,
+                },
+              },
+            },
+          },
+          configs: {
             type: 'array',
             items: {
               type: 'object',
@@ -135,6 +206,9 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       baseUrlDirName?: string;
     }
 
+    /**
+     * Find imports in ESTree and return it with self defined import type
+     */
     function resolveEveryImportTypeAndIdentifier(
       declaration:
         | TSESTree.ImportDeclaration
@@ -143,25 +217,28 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     ): ImportInfo[] {
       if (declaration.type === 'ImportDeclaration') {
         return declaration.specifiers.map(specifier => {
-          let identifier = specifier.local;
+          let localIdentifier = specifier.local;
 
           switch (specifier.type) {
             case 'ImportDefaultSpecifier':
               return {
                 importType: 'default',
-                identifier,
+                localIdentifier,
+                importedIdentifier: undefined,
               };
 
             case 'ImportNamespaceSpecifier':
               return {
                 importType: 'namespace',
-                identifier,
+                localIdentifier,
+                importedIdentifier: undefined,
               };
 
             case 'ImportSpecifier':
               return {
                 importType: 'named',
-                identifier,
+                localIdentifier,
+                importedIdentifier: specifier.imported,
               };
 
             default:
@@ -172,7 +249,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         return [
           {
             importType: 'equals',
-            identifier: declaration.id,
+            localIdentifier: declaration.id,
+            importedIdentifier: undefined,
           },
         ];
       } else {
@@ -181,7 +259,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     }
 
     function reportErrors(importInfos: ImportInfo[]): void {
-      for (let {identifier} of importInfos) {
+      for (let {localIdentifier: identifier} of importInfos) {
         context.report({
           node: identifier,
           messageId: 'importTypeNotUnified', // TODO (ooyyloo): distinguish error message type 'identifierNotTheSame'
@@ -210,9 +288,9 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     function reportPreviousErrors(
       importTypes: ImportType[],
       groups: _.Dictionary<ImportInfo[]>,
-      reportNeededInfos: ReportNeededInfo[],
+      previouslyImportInfos: ImportIdentifyInfo[],
     ): void {
-      for (let info of reportNeededInfos) {
+      for (let info of previouslyImportInfos) {
         const data = {
           filename: info.filename,
           identifier: info.identifier.name,
@@ -220,24 +298,24 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
           column: info.identifier.loc.start.column,
         };
 
-        if (importTypes.length !== 1) {
-          for (let importType of importTypes) {
-            if (info.importType !== importType) {
-              reportPreviousError(info.identifier, data);
-
-              break;
-            }
-          }
-        } else {
+        if (importTypes.length === 1) {
           if (info.importType !== importTypes[0]) {
             reportPreviousError(info.identifier, data);
           } else {
-            for (let {identifier} of groups[info.importType]) {
+            for (let {localIdentifier: identifier} of groups[info.importType]) {
               if (identifier.name !== info.identifier.name) {
                 reportPreviousError(info.identifier, data);
 
                 break;
               }
+            }
+          }
+        } else {
+          for (let importType of importTypes) {
+            if (info.importType !== importType) {
+              reportPreviousError(info.identifier, data);
+
+              break;
             }
           }
         }
@@ -247,26 +325,28 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     /** check if groups plus reportNeededInfos satisfy the unification constraint */
     function checkUnity(
       groups: _.Dictionary<ImportInfo[]>,
-      reportNeededInfos: ReportNeededInfo[] | undefined,
+      previouslyImportInfos: ImportIdentifyInfo[] | undefined,
       additionalInfos: {importTypes: ImportType[]},
     ): boolean {
       let importTypes =
         additionalInfos.importTypes || (Object.keys(groups) as ImportType[]);
 
       if (
+        // There are multiple import type, not allowed by default
         importTypes.length > 1 ||
+        // TODO (ooyyloo): Is this case exist in real world?
         (importTypes[0] !== 'named' && groups[importTypes[0]].length > 1)
       ) {
         return false;
       }
 
-      if (!reportNeededInfos) {
+      if (!previouslyImportInfos) {
         return true;
       }
 
-      let identifierName = groups[importTypes[0]][0].identifier.name;
+      let identifierName = groups[importTypes[0]][0].localIdentifier.name;
 
-      for (let info of reportNeededInfos) {
+      for (let info of previouslyImportInfos) {
         if (info.importType !== importTypes[0]) {
           return false;
         }
@@ -281,21 +361,24 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       return true;
     }
 
-    function handleIdentical(
+    /**
+     * Ensure imports with same type have same name across all file
+     */
+    function handleNameIdenticalImport(
       path: string,
       importType: ImportType,
-      identifier: TSESTree.Identifier,
+      importIdentifier: TSESTree.Identifier,
     ): void {
       let reportInfo = modulePathToReportInfoMap.get(path);
 
       if (!reportInfo) {
         modulePathToReportInfoMap.set(path, {
           reported: false,
-          reportNeededInfos: [
+          importIdentifyInfos: [
             {
               filename: context.getFilename(),
               importType,
-              identifier,
+              identifier: importIdentifier,
             },
           ],
         });
@@ -303,66 +386,116 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         return;
       }
 
-      if (
-        !reportInfo.reportedImportTypeSet ||
-        !reportInfo.reportedImportTypeSet.has(importType)
-      ) {
-        for (let info of reportInfo.reportNeededInfos!) {
+      if (!reportInfo.reportedImportTypeSet) {
+        reportInfo.reportedImportTypeSet = new Set();
+      }
+
+      if (!reportInfo.reportedImportTypeSet.has(importType)) {
+        for (let previouslyImportInfo of reportInfo.importIdentifyInfos!) {
+          // Imports to same module with same type must have same name across
+          // several file, can different with module name.
           if (
-            info.importType === importType &&
-            info.identifier.name !== identifier.name
+            importType === previouslyImportInfo.importType &&
+            importIdentifier.name !== previouslyImportInfo.identifier.name
           ) {
             context.report({
-              node: identifier,
+              node: importIdentifier,
               messageId: 'importTypeNotUnified',
             });
 
-            reportInfo.reportedImportTypeSet =
-              reportInfo.reportedImportTypeSet || new Set();
             reportInfo.reportedImportTypeSet.add(importType);
 
-            let newReportNeededInfos = [];
+            let newImportIdentifyInfos = [];
 
-            for (let oldReportNeededInfo of reportInfo.reportNeededInfos!) {
-              if (oldReportNeededInfo.importType !== importType) {
-                newReportNeededInfos.push(oldReportNeededInfo);
-              } else {
+            // Report previous founded imports with same type as error, and keep
+            // Others for future report
+            for (let importIdentifyInfo of reportInfo.importIdentifyInfos!) {
+              if (importIdentifyInfo.importType === importType) {
                 const data = {
-                  filename: oldReportNeededInfo.filename,
-                  identifier: oldReportNeededInfo.identifier.name,
-                  line: oldReportNeededInfo.identifier.loc.start.line,
-                  column: oldReportNeededInfo.identifier.loc.start.column,
+                  filename: importIdentifyInfo.filename,
+                  identifier: importIdentifyInfo.identifier.name,
+                  line: importIdentifyInfo.identifier.loc.start.line,
+                  column: importIdentifyInfo.identifier.loc.start.column,
                 };
 
-                reportPreviousError(oldReportNeededInfo.identifier, data);
+                reportPreviousError(importIdentifyInfo.identifier, data);
+              } else {
+                newImportIdentifyInfos.push(importIdentifyInfo);
               }
             }
 
-            reportInfo.reportNeededInfos = newReportNeededInfos;
+            reportInfo.importIdentifyInfos = newImportIdentifyInfos;
 
             return;
           }
         }
 
-        reportInfo.reportNeededInfos = (
-          reportInfo.reportNeededInfos || []
-        ).concat([
+        reportInfo.importIdentifyInfos = [
+          ...(reportInfo.importIdentifyInfos || []),
           {
             filename: context.getFilename(),
             importType,
-            identifier,
+            identifier: importIdentifier,
           },
-        ]);
+        ];
 
         return;
       }
 
       context.report({
-        node: identifier,
+        node: importIdentifier,
         messageId: 'importTypeNotUnified',
       });
     }
 
+    /*
+     Helper start
+    */
+
+    // Check is there a exemption config for this module
+    function isConfiguredModule(moduleSpecifier: string): boolean {
+      let hasQuickConfig = options.quickConfigs?.some(
+        quickConfig => quickConfig.modules.indexOf(moduleSpecifier) >= 0,
+      );
+
+      let hasGeneralConfig = options.configs?.some(
+        rule => rule.module === moduleSpecifier,
+      );
+
+      return Boolean(hasQuickConfig || hasGeneralConfig);
+    }
+
+    /**
+     * Check is the name of import specifier follow configured naming type
+     */
+    function isNamingTypeMatch(
+      namingType: QuickConfigImportNamingType,
+      referenceName: string,
+      name: string,
+    ): boolean {
+      let unifiedReferenceName = referenceName.toLowerCase();
+      let unifiedName = name.toLowerCase();
+
+      switch (namingType) {
+        case 'as-is':
+          return unifiedName === unifiedReferenceName;
+        case 'as-is-with-underscore':
+          return (
+            unifiedName === unifiedReferenceName ||
+            unifiedName === `_${unifiedReferenceName}`
+          );
+        case 'any':
+          return true;
+      }
+    }
+
+    /*
+     Helper end
+    */
+
+    /*
+     Entry point
+    */
     function addAndReportUnificationErrors(
       moduleSpecifier: string,
       importInfos: ImportInfo[],
@@ -379,158 +512,210 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
       let reportInfo = modulePathToReportInfoMap.get(path);
 
-      let groups: _.Dictionary<ImportInfo[]> = _.groupBy(
+      let importTypeToInfoDict: _.Dictionary<ImportInfo[]> = _.groupBy(
         importInfos,
         'importType',
       );
-      let importTypes = Object.keys(groups) as ImportType[];
+      let importTypes = Object.keys(importTypeToInfoDict) as ImportType[];
 
-      if (
-        !options.except ||
-        !_.some(options.except, ['module', moduleSpecifier])
-      ) {
-        // This module specifier is not an exception
+      if (!isConfiguredModule(moduleSpecifier)) {
+        // No exemption config for this module
 
+        // This file was previously reported
         if (reportInfo?.reported) {
-          // there's already more than one kind of import type or more than one kind of identifier
+          return reportErrors(importInfos);
+        }
 
-          reportErrors(importInfos);
-        } else {
-          if (!reportInfo) {
-            // Previously no such module specifier added
+        // This file was added previously in analysis scope
+        if (reportInfo) {
+          if (
+            // There are multiple import type, not allowed by default
+            importTypes.length !== 1 ||
+            // TODO (ooyyloo): Is this case exist in real world?
+            (importTypes[0] !== 'named' &&
+              importTypeToInfoDict[importTypes[0]].length !== 1)
+          ) {
+            reportErrors(importInfos);
 
-            if (
-              importTypes.length !== 1 ||
-              (importTypes[0] !== 'named' &&
-                groups[importTypes[0]].length !== 1)
-            ) {
-              reportErrors(importInfos);
+            reportInfo.reported = true;
 
-              modulePathToReportInfoMap.set(path, {
-                reported: true,
-                reportNeededInfos: undefined,
-              });
-            } else {
-              // only one kind of import type and only one identifier
+            if (reportInfo.importIdentifyInfos) {
+              reportPreviousErrors(
+                importTypes,
+                importTypeToInfoDict,
+                reportInfo.importIdentifyInfos,
+              );
 
-              modulePathToReportInfoMap.set(path, {
-                reported: false,
-                reportNeededInfos: [
-                  {
-                    importType: importInfos[0].importType,
-                    identifier: importInfos[0].identifier,
-                    filename: context.getFilename(),
-                  },
-                ],
-              });
+              reportInfo.importIdentifyInfos = undefined;
             }
           } else {
-            // Previously such module specifier has been added
-
             if (
-              importTypes.length !== 1 ||
-              (importTypes[0] !== 'named' &&
-                groups[importTypes[0]].length !== 1)
+              !checkUnity(
+                importTypeToInfoDict,
+                reportInfo.importIdentifyInfos,
+                {
+                  importTypes,
+                },
+              )
             ) {
               reportErrors(importInfos);
 
+              reportPreviousErrors(
+                importTypes,
+                importTypeToInfoDict,
+                reportInfo.importIdentifyInfos!,
+              );
+
               reportInfo.reported = true;
-
-              if (reportInfo.reportNeededInfos) {
-                reportPreviousErrors(
-                  importTypes,
-                  groups,
-                  reportInfo.reportNeededInfos,
-                );
-
-                reportInfo.reportNeededInfos = undefined;
-              }
+              reportInfo.importIdentifyInfos = undefined;
             } else {
-              if (
-                !checkUnity(groups, reportInfo.reportNeededInfos, {
-                  importTypes,
-                })
-              ) {
-                reportErrors(importInfos);
-
-                reportPreviousErrors(
-                  importTypes,
-                  groups,
-                  reportInfo.reportNeededInfos!,
-                );
-
-                reportInfo.reported = true;
-                reportInfo.reportNeededInfos = undefined;
-              } else {
-                reportInfo.reportNeededInfos = (
-                  reportInfo.reportNeededInfos || []
-                ).concat([
-                  {
-                    filename: context.getFilename(),
-                    importType: importTypes[0],
-                    identifier: importInfos[0].identifier,
-                  },
-                ]);
-              }
+              reportInfo.importIdentifyInfos = (
+                reportInfo.importIdentifyInfos || []
+              ).concat([
+                {
+                  filename: context.getFilename(),
+                  importType: importTypes[0],
+                  identifier: importInfos[0].localIdentifier,
+                },
+              ]);
             }
+          }
+        } else {
+          if (
+            importTypes.length !== 1 ||
+            (importTypes[0] !== 'named' &&
+              importTypeToInfoDict[importTypes[0]].length !== 1)
+          ) {
+            reportErrors(importInfos);
+
+            modulePathToReportInfoMap.set(path, {
+              reported: true,
+              importIdentifyInfos: undefined,
+            });
+          } else {
+            // only one kind of import type and only one identifier
+
+            modulePathToReportInfoMap.set(path, {
+              reported: false,
+              importIdentifyInfos: [
+                {
+                  importType: importInfos[0].importType,
+                  identifier: importInfos[0].localIdentifier,
+                  filename: context.getFilename(),
+                },
+              ],
+            });
           }
         }
       } else {
         // This module specifier is configured
 
-        let allowedTypeInfos = options.except.find(
+        let quickConfig = options.quickConfigs?.find(config =>
+          config.modules.find(name => name === moduleSpecifier),
+        );
+        let allowedTypeInfos = options.configs?.find(
           exception => exception.module === moduleSpecifier,
         )?.allow;
 
-        if (!allowedTypeInfos) {
+        if (!quickConfig && !allowedTypeInfos) {
           return;
         }
 
         for (let importType of importTypes) {
-          for (let {identifier} of groups[importType]) {
+          for (let {
+            localIdentifier,
+            importedIdentifier,
+          } of importTypeToInfoDict[importType]) {
             let allowed = false;
 
-            for (let allowedTypeInfo of allowedTypeInfos) {
-              if (_.isString(allowedTypeInfo)) {
-                if (allowedTypeInfo !== importType) {
-                  continue;
-                }
+            // Prefer quick config
+            if (quickConfig?.allowDefaultAndNamedImport) {
+              let {
+                defaultImportNamingType,
+                namedImportNamingType,
+              } = quickConfig;
+              switch (importType) {
+                case 'default':
+                  if (
+                    isNamingTypeMatch(
+                      defaultImportNamingType ?? 'as-is',
+                      moduleSpecifier,
+                      localIdentifier.name,
+                    )
+                  ) {
+                    continue;
+                  }
 
-                allowed = true; // fake
+                  break;
+                case 'named':
+                  if (
+                    isNamingTypeMatch(
+                      namedImportNamingType ?? 'as-is',
+                      // Always exist in named import
+                      importedIdentifier!.name,
+                      localIdentifier.name,
+                    )
+                  ) {
+                    continue;
+                  }
 
-                handleIdentical(path, importType, identifier);
-              } else if (allowedTypeInfo.type === importType) {
-                if (_.isString(allowedTypeInfo.identifiers)) {
-                  if (allowedTypeInfo.identifiers === '*') {
-                    allowed = true;
-                  } else if (allowedTypeInfo.identifiers === 'identical') {
-                    allowed = true; // fake
+                  break;
+              }
+            }
 
-                    handleIdentical(path, importType, identifier);
+            // If no quick config or disabled, fallback to general config
+            if (allowedTypeInfos) {
+              for (let allowedTypeInfo of allowedTypeInfos) {
+                if (typeof allowedTypeInfo === 'string') {
+                  if (allowedTypeInfo !== importType) {
+                    continue;
+                  }
+
+                  // Bypass type mismatch error report and hand it over to name
+                  // identical check
+                  allowed = true;
+
+                  handleNameIdenticalImport(path, importType, localIdentifier);
+                } else if (allowedTypeInfo.type === importType) {
+                  if (typeof allowedTypeInfo.identifiers === 'string') {
+                    if (allowedTypeInfo.identifiers === '*') {
+                      allowed = true;
+                    } else if (allowedTypeInfo.identifiers === 'identical') {
+                      // Same here, bypass
+                      allowed = true;
+
+                      handleNameIdenticalImport(
+                        path,
+                        importType,
+                        localIdentifier,
+                      );
+                    } else {
+                      throw new Error(
+                        `Wrong Configuration: identifiers: ${allowedTypeInfo.identifiers}`,
+                      );
+                    }
+                  } else if (Array.isArray(allowedTypeInfo.identifiers)) {
+                    if (
+                      allowedTypeInfo.identifiers.includes(localIdentifier.name)
+                    ) {
+                      allowed = true;
+                    } else {
+                      // Nothing. Error will be reported below.
+                    }
                   } else {
                     throw new Error(
                       `Wrong Configuration: identifiers: ${allowedTypeInfo.identifiers}`,
                     );
                   }
-                } else if (Array.isArray(allowedTypeInfo.identifiers)) {
-                  if (allowedTypeInfo.identifiers.includes(identifier.name)) {
-                    allowed = true;
-                  } else {
-                    // Nothing. Error will be reported below.
-                  }
-                } else {
-                  throw new Error(
-                    `Wrong Configuration: identifiers: ${allowedTypeInfo.identifiers}`,
-                  );
-                }
 
-                break;
+                  break;
+                }
               }
             }
 
             if (!allowed) {
               context.report({
-                node: identifier,
+                node: localIdentifier,
                 messageId: 'importTypeNotUnified',
               });
             }
@@ -582,7 +767,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
           let importInfos: ImportInfo[] = [
             {
               importType: 'equals',
-              identifier: declaration.id,
+              localIdentifier: declaration.id,
+              importedIdentifier: undefined,
             },
           ];
 

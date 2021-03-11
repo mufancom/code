@@ -1,11 +1,19 @@
-import FS from 'fs';
-import Path from 'path';
-
 import {RuleTesterConfig} from '@typescript-eslint/experimental-utils/dist/ts-eslint';
 
 import {rules} from '../rules';
 
-import {RuleTester} from './@utils';
+import {
+  RuleTester,
+  getTestFileContent as _getTestFileContent,
+  getTestFileFullPath as _getTestFileFullPath,
+  getTestsDirPath as _getTestsDirPath,
+} from './@utils';
+
+const RULE_DIR = _getTestsDirPath('import-type-unification');
+
+const getTestFilePath = _getTestFileFullPath.bind(undefined, RULE_DIR);
+
+const getTestFile = _getTestFileContent.bind(undefined, RULE_DIR);
 
 const ruleTester1 = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -13,10 +21,7 @@ const ruleTester1 = new RuleTester({
     ecmaVersion: 2018,
     sourceType: 'module',
     project: './tsconfig.json',
-    tsconfigRootDir: Path.join(
-      __dirname,
-      '../../test/import-type-unification/',
-    ),
+    tsconfigRootDir: RULE_DIR,
   },
 });
 
@@ -24,42 +29,27 @@ ruleTester1.run('import-type-unification', rules['import-type-unification'], {
   valid: [],
   invalid: [
     {
-      code: FS.readFileSync(
-        Path.join(__dirname, '../../test/import-type-unification/test1.ts'),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/import-type-unification/test1.ts',
-      ),
+      code: getTestFile('test1.ts'),
+      filename: getTestFilePath('test1.ts'),
       errors: [
         {messageId: 'importTypeNotUnified', line: 1},
         {messageId: 'importTypeNotUnified', line: 2},
       ],
     },
     {
-      code: FS.readFileSync(
-        Path.join(__dirname, '../../test/import-type-unification/test2.ts'),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/import-type-unification/test2.ts',
-      ),
+      code: getTestFile('test2.ts'),
+      filename: getTestFilePath('test2.ts'),
       errors: [
         {messageId: 'importTypeNotUnified', line: 5},
         {messageId: 'importTypeNotUnified', line: 6},
       ],
     },
     {
-      code: FS.readFileSync(
-        Path.join(__dirname, '../../test/import-type-unification/test3.ts'),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/import-type-unification/test3.ts',
-      ),
+      code: getTestFile('test3.ts'),
+      filename: getTestFilePath('test3.ts'),
       options: [
         {
-          except: [
+          configs: [
             {
               module: 'http',
               allow: [
@@ -91,6 +81,55 @@ ruleTester1.run('import-type-unification', rules['import-type-unification'], {
         {messageId: 'importTypeNotUnified', line: 10, column: 15},
       ],
     },
+    {
+      code: getTestFile('test4.ts'),
+      filename: getTestFilePath('test4.ts'),
+      options: [
+        {
+          quickConfigs: [
+            {
+              modules: ['http'],
+              allowDefaultAndNamedImport: false,
+            },
+            {
+              modules: ['https'],
+              allowDefaultAndNamedImport: true,
+            },
+            {
+              modules: ['crypto'],
+              allowDefaultAndNamedImport: true,
+              defaultImportNamingType: 'as-is',
+            },
+            {
+              modules: ['assert'],
+              allowDefaultAndNamedImport: true,
+              defaultImportNamingType: 'as-is-with-underscore',
+            },
+            {
+              modules: ['url'],
+              allowDefaultAndNamedImport: true,
+              defaultImportNamingType: 'any',
+            },
+            {
+              modules: ['buffer'],
+              allowDefaultAndNamedImport: true,
+              namedImportNamingType: 'as-is-with-underscore',
+            },
+            {
+              modules: ['process', 'os'],
+              allowDefaultAndNamedImport: true,
+              namedImportNamingType: 'any',
+            },
+          ],
+        },
+      ],
+      errors: [
+        {messageId: 'importTypeNotUnified', line: 6, column: 8},
+        {messageId: 'importTypeNotUnified', line: 6, column: 15},
+        {messageId: 'importTypeNotUnified', line: 12},
+        {messageId: 'importTypeNotUnified', line: 21, column: 30},
+      ],
+    },
   ],
 });
 
@@ -107,16 +146,11 @@ ruleTester2.run(
   {
     valid: [
       {
-        code: FS.readFileSync(
-          Path.join(__dirname, '../../test/import-type-unification/test2.js'),
-        ).toString(),
-        filename: Path.join(
-          __dirname,
-          '../../test/import-type-unification/test2.js',
-        ),
+        code: getTestFile('test2.js'),
+        filename: getTestFilePath('test2.js'),
         options: [
           {
-            except: [
+            configs: [
               {
                 module: 'fs',
                 allow: ['default', 'namespace'],
@@ -128,29 +162,19 @@ ruleTester2.run(
     ],
     invalid: [
       {
-        code: FS.readFileSync(
-          Path.join(__dirname, '../../test/import-type-unification/test1.js'),
-        ).toString(),
-        filename: Path.join(
-          __dirname,
-          '../../test/import-type-unification/test1.js',
-        ),
+        code: getTestFile('test1.js'),
+        filename: getTestFilePath('test1.js'),
         errors: [
           {messageId: 'importTypeNotUnified', line: 1},
           {messageId: 'importTypeNotUnified', line: 2},
         ],
       },
       {
-        code: FS.readFileSync(
-          Path.join(__dirname, '../../test/import-type-unification/test3.js'),
-        ).toString(),
-        filename: Path.join(
-          __dirname,
-          '../../test/import-type-unification/test3.js',
-        ),
+        code: getTestFile('test3.js'),
+        filename: getTestFilePath('test3.js'),
         options: [
           {
-            except: [
+            configs: [
               {
                 module: './foo',
                 allow: ['namespace'],
