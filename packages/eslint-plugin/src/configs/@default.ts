@@ -376,6 +376,7 @@ export const defaultConfig = {
         html: true,
       },
     ],
+    'react/jsx-uses-vars': 'error',
     'require-atomic-updates': 'off',
     'require-await': 'off',
     'require-unicode-regexp': 'off',
@@ -425,8 +426,8 @@ export const defaultConfig = {
       rules: {
         '@mufan/explicit-return-type': 'error',
         '@mufan/import-path-base-url': 'off',
-        '@mufan/no-unnecessary-type-assertion': 'error',
         '@mufan/strict-key-order': 'error',
+        '@mufan/no-unnecessary-type-assertion': 'error',
         '@typescript-eslint/adjacent-overload-signatures': 'error',
         '@typescript-eslint/array-type': [
           'error',
@@ -526,8 +527,7 @@ export const defaultConfig = {
         '@typescript-eslint/no-unnecessary-condition': 'off',
         '@typescript-eslint/no-unnecessary-qualifier': 'error',
         '@typescript-eslint/no-unnecessary-type-arguments': 'error',
-        '@typescript-eslint/no-unnecessary-type-assertion': 'off',
-        '@typescript-eslint/no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars-experimental': 'error',
         '@typescript-eslint/no-use-before-define': 'off',
         '@typescript-eslint/no-useless-constructor': 'off',
         '@typescript-eslint/prefer-function-type': 'error',

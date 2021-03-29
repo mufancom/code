@@ -18,6 +18,7 @@
     "newLine": "LF",
     "rootDir": ".",
     "outDir": "../bld",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   }
 }
