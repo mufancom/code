@@ -35,18 +35,18 @@
     "typescript": "^3.5.3 || ^4"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^3.5.0",
-    "@typescript-eslint/experimental-utils": "^3.5.0",
-    "@typescript-eslint/parser": "^3.5.0",
+    "@typescript-eslint/eslint-plugin": "^4.16.1",
+    "@typescript-eslint/experimental-utils": "^4.16.1",
+    "@typescript-eslint/parser": "^4.16.1",
     "diff": "^4.0.2",
-    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-no-null": "^1.0.2",
     "eslint-plugin-only-warn": "^1.0.2",
-    "eslint-plugin-react": "^7.20.6",
-    "eslint-plugin-react-hooks": "^4.1.0",
-    "lodash": "^4.17.15",
-    "module-lens": "^0.1.3",
-    "tslang": "^0.1.22",
-    "tsutils": "^3.17.1"
+    "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "lodash": "^4.17.21",
+    "module-lens": "^0.1.6",
+    "tslang": "^0.1.23",
+    "tsutils": "^3.20.0"
   }
 }
