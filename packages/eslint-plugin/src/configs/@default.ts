@@ -367,8 +367,9 @@ export const defaultConfig = {
     'quote-props': 'off',
     quotes: 'off',
     radix: 'off',
-    'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'error',
+    'react-hooks/rules-of-hooks': 'error',
+    'react/jsx-uses-vars': 'error',
     'react/self-closing-comp': [
       'error',
       {
@@ -527,7 +528,7 @@ export const defaultConfig = {
         '@typescript-eslint/no-unnecessary-qualifier': 'error',
         '@typescript-eslint/no-unnecessary-type-arguments': 'error',
         '@typescript-eslint/no-unnecessary-type-assertion': 'off',
-        '@typescript-eslint/no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars-experimental': 'error',
         '@typescript-eslint/no-use-before-define': 'off',
         '@typescript-eslint/no-useless-constructor': 'off',
         '@typescript-eslint/prefer-function-type': 'error',
