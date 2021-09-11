@@ -13,6 +13,7 @@
     "strictFunctionTypes": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "useDefineForClassFields": true,
 
     "newLine": "LF"
   }
