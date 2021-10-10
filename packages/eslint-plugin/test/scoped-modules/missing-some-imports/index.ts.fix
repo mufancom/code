@@ -1,3 +1,3 @@
-export * from './pia';
+export * from './pia.js';
 // ...
-export * from './foo';
+export * from './foo.js';

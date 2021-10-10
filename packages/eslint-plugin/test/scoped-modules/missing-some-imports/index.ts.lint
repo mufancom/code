@@ -1,2 +1,2 @@
-export * from './pia';
+export * from './pia.js';
 // ...
