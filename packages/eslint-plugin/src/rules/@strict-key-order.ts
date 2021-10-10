@@ -82,9 +82,12 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
         typeAnnotation.typeAnnotation,
       );
 
-      let typeKeys = mapIteratorToArray(
-        typeChecker.getTypeAtLocation(typeNode).symbol.members!.keys(),
-      );
+      let typeNodeMembers = typeChecker.getTypeAtLocation(typeNode).symbol
+        .members;
+
+      let typeKeys = typeNodeMembers
+        ? mapIteratorToArray(typeNodeMembers.keys())
+        : [];
 
       let propertyKeyInfos: PropertyKeyInfo[] = _.compact(
         init.properties.map((property, index) => {

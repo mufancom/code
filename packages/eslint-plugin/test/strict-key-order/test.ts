@@ -76,3 +76,9 @@ let aa: /* strict-key-order */ A = {
   m: 0,
   n: 0,
 };
+
+interface B {}
+
+let bb: B = {
+  ...{},
+};
