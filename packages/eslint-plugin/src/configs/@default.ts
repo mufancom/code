@@ -270,7 +270,7 @@ export const defaultConfig = {
     'no-new-require': 'off',
     'no-new-symbol': 'off',
     'no-new-wrappers': 'error',
-    'no-null/no-null': 'error',
+    'no-null/no-null': 'off',
     'no-obj-calls': 'off',
     'no-octal': 'off',
     'no-octal-escape': 'off',
@@ -426,7 +426,6 @@ export const defaultConfig = {
       rules: {
         '@mufan/explicit-return-type': 'error',
         '@mufan/import-path-base-url': 'off',
-        '@mufan/no-unnecessary-type-assertion': 'error',
         '@mufan/strict-key-order': 'error',
         '@typescript-eslint/adjacent-overload-signatures': 'error',
         '@typescript-eslint/array-type': [

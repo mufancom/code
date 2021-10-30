@@ -7,7 +7,6 @@ import {importPathNoParentRule} from './@import-path-no-parent-rule';
 import {importPathShallowestRule} from './@import-path-shallowest-rule';
 import {importPathStrictHierarchyRule} from './@import-path-strict-hierarchy-rule';
 import {noEmptyConstructorRule} from './@no-empty-constructor-rule';
-import {noUnnecessaryTypeAssertionRule} from './@no-unnecessary-type-assertion';
 import {orderedImportsRule} from './@ordered-imports';
 import {scopedModulesRule} from './@scoped-modules-rule';
 import {strictKeyOrderRule} from './@strict-key-order';
@@ -22,7 +21,6 @@ export const rules = {
   'import-path-shallowest': importPathShallowestRule,
   'import-path-strict-hierarchy': importPathStrictHierarchyRule,
   'no-empty-constructor': noEmptyConstructorRule,
-  'no-unnecessary-type-assertion': noUnnecessaryTypeAssertionRule,
   'ordered-imports': orderedImportsRule,
   'scoped-modules': scopedModulesRule,
   'strict-key-order': strictKeyOrderRule,
