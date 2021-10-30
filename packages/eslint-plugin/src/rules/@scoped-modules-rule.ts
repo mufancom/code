@@ -40,7 +40,6 @@ export const scopedModulesRule = createRule<Options, MessageId>({
   meta: {
     docs: {
       description: '',
-      category: 'Stylistic Issues',
       recommended: 'error',
     },
     messages,

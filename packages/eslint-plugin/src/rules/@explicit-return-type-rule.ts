@@ -49,7 +49,6 @@ export const explicitReturnTypeRule = createRule<Options, MessageId>({
     type: 'suggestion',
     docs: {
       description: '',
-      category: 'Stylistic Issues',
       recommended: 'error',
     },
     messages,

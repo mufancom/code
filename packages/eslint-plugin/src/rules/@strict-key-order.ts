@@ -18,8 +18,7 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
   meta: {
     docs: {
       description:
-        'Check if the order of object keys matchs the order of the type',
-      category: 'Stylistic Issues',
+        'Check if the order of object keys matches the order of the type',
       recommended: 'error',
     },
     messages,

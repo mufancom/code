@@ -25,7 +25,6 @@ export const importPathNoParentRule = createRule<Options, MessageId>({
   meta: {
     docs: {
       description: '',
-      category: 'Possible Errors',
       recommended: 'error',
     },
     messages,

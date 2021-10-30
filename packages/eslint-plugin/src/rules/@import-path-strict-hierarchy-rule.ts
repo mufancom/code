@@ -31,7 +31,6 @@ export const importPathStrictHierarchyRule = createRule<Options, MessageId>({
   meta: {
     docs: {
       description: 'Check import module from baseUrl',
-      category: 'Best Practices',
       recommended: 'error',
     },
     messages,

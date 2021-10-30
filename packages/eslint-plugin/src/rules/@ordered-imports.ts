@@ -69,7 +69,6 @@ export const orderedImportsRule = createRule<Options, MessageId>({
     docs: {
       description:
         'Requires that import statements be alphabetized and grouped.',
-      category: 'Stylistic Issues',
       recommended: 'error',
     },
     messages,
@@ -148,7 +147,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
 
     let reportDescriptors: {
       node?: TSESTree.Node;
-      loc?: TSESTree.SourceLocation | TSESTree.LineAndColumnData;
+      loc?: TSESTree.SourceLocation | TSESTree.Position;
       messageId: MessageId;
       lastFix: FixFunction[];
     }[] = [];
@@ -878,9 +877,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       context.getSourceCode().ast,
     );
 
-    new Walker(sourceFile, parseOptions(options)).walk(
-      sourceFile,
-    );
+    new Walker(sourceFile, parseOptions(options)).walk(sourceFile);
 
     for (let reportDescriptor of reportDescriptors) {
       if (reportDescriptor.node) {

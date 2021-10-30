@@ -69,7 +69,6 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
     docs: {
       description:
         'Validate and insert appropriate empty lines around block-included statements',
-      category: 'Stylistic Issues',
       recommended: 'error',
     },
     messages,

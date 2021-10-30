@@ -17,7 +17,6 @@ export const noEmptyConstructorRule = createRule<Options, MessageId>({
   meta: {
     docs: {
       description: '',
-      category: 'Best Practices',
       recommended: 'error',
     },
     messages,

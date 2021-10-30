@@ -43,7 +43,6 @@ export const importGroupsRule = createRule<Options, MessageId>({
     type: 'suggestion',
     docs: {
       description: 'Validate that module imports are grouped as expected.',
-      category: 'Stylistic Issues',
       recommended: 'error',
     },
     messages,

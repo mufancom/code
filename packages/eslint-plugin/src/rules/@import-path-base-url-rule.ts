@@ -29,7 +29,6 @@ export const importPathBaseUrlRule = createRule<Options, MessageId>({
   meta: {
     docs: {
       description: 'Check import module from baseUrl',
-      category: 'Stylistic Issues',
       recommended: 'error',
     },
     messages,

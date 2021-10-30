@@ -25,7 +25,6 @@ export const importPathBeSmartRule = createRule<Options, MessageId>({
     docs: {
       description:
         'Check to if import path is a shortest path and provide fixer.',
-      category: 'Best Practices',
       recommended: 'error',
     },
     messages,
