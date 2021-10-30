@@ -82,6 +82,7 @@ export const defaultConfig = {
     '@mufan/import-path-shallowest': 'error',
     '@mufan/import-path-strict-hierarchy': 'off',
     '@mufan/no-empty-constructor': 'error',
+    '@mufan/no-object-literal-type-assertion': 'error',
     '@mufan/ordered-imports': [
       'error',
       {
