@@ -1,4 +1,4 @@
-import {AST_NODE_TYPES} from '@typescript-eslint/experimental-utils';
+import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/experimental-utils';
 
 import {createRule} from './@utils';
 
@@ -25,16 +25,23 @@ export const noObjectLiteralTypeAssertionRule = createRule<Options, MessageId>({
   defaultOptions: [],
   create(context) {
     return {
-      TSTypeAssertion(node) {
-        if (node.expression.type === AST_NODE_TYPES.ObjectExpression) {
-          context.report({node, messageId: 'objectLiteralTypeAssertion'});
-        }
-      },
-      TSAsExpression(node) {
-        if (node.expression.type === AST_NODE_TYPES.ObjectExpression) {
-          context.report({node, messageId: 'objectLiteralTypeAssertion'});
-        }
-      },
+      TSTypeAssertion: visit,
+      TSAsExpression: visit,
     };
+
+    function visit(
+      node: TSESTree.TSTypeAssertion | TSESTree.TSAsExpression,
+    ): void {
+      if (
+        node.expression.type === AST_NODE_TYPES.ObjectExpression &&
+        !(
+          node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
+          node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
+          node.typeAnnotation.typeName.name === 'const'
+        )
+      ) {
+        context.report({node, messageId: 'objectLiteralTypeAssertion'});
+      }
+    }
   },
 });

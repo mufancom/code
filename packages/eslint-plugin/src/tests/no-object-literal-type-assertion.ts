@@ -23,6 +23,16 @@ foo as Bar
       },
       {
         code: `
+const a = <Bar>foo
+            `,
+      },
+      {
+        code: `
+const a = {} as const
+            `,
+      },
+      {
+        code: `
 const a = {foo: '' as Bar}
             `,
       },
