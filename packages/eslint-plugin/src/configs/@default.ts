@@ -528,7 +528,11 @@ export const defaultConfig = {
         '@typescript-eslint/no-unnecessary-qualifier': 'error',
         '@typescript-eslint/no-unnecessary-type-arguments': 'error',
         '@typescript-eslint/no-unnecessary-type-assertion': 'off',
-        '@typescript-eslint/no-unused-vars': 'error',
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          {varsIgnorePattern: '^_'},
+          {argsIgnorePattern: '^_'},
+        ],
         '@typescript-eslint/no-use-before-define': 'off',
         '@typescript-eslint/no-useless-constructor': 'off',
         '@typescript-eslint/prefer-function-type': 'error',
