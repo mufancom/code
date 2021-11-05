@@ -530,8 +530,10 @@ export const defaultConfig = {
         '@typescript-eslint/no-unnecessary-type-assertion': 'off',
         '@typescript-eslint/no-unused-vars': [
           'error',
-          {varsIgnorePattern: '^_'},
-          {argsIgnorePattern: '^_'},
+          {
+            varsIgnorePattern: '^_',
+            argsIgnorePattern: '^_',
+          },
         ],
         '@typescript-eslint/no-use-before-define': 'off',
         '@typescript-eslint/no-useless-constructor': 'off',
