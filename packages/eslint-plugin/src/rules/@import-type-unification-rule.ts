@@ -85,7 +85,7 @@ interface QuickConfigOptions {
    *
    * as-is: foobar and FooBar or fooBar was allowed
    *
-   * as-is-with-underscore: all name in 'as-is' plus '_foobar'
+   * as-is-with-underscore: all name in 'as-is' plus '_'. Example: '_foobar'
    *
    * any: no limitation at all
    */
@@ -212,8 +212,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     function resolveEveryImportTypeAndIdentifier(
       declaration:
         | TSESTree.ImportDeclaration
-        | TSESTree.TSImportEqualsDeclaration
-        | TSESTree.ExportAllDeclaration,
+        | TSESTree.TSImportEqualsDeclaration,
     ): ImportInfo[] {
       if (declaration.type === 'ImportDeclaration') {
         return declaration.specifiers.map(specifier => {
@@ -323,7 +322,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     }
 
     /** check if groups plus reportNeededInfos satisfy the unification constraint */
-    function checkUnity(
+    function checkDefaultUnity(
       groups: _.Dictionary<ImportInfo[]>,
       previouslyImportInfos: ImportIdentifyInfo[] | undefined,
       additionalInfos: {importTypes: ImportType[]},
@@ -332,30 +331,40 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         additionalInfos.importTypes || (Object.keys(groups) as ImportType[]);
 
       if (
-        // There are multiple import type, not allowed by default
-        importTypes.length > 1 ||
-        // TODO (ooyyloo): Is this case exist in real world?
-        (importTypes[0] !== 'named' && groups[importTypes[0]].length > 1)
+        !previouslyImportInfos?.some(
+          previouslyImportInfo => previouslyImportInfo.importType !== 'default'
+          && previouslyImportInfo.importType !== 'named'
+        )
+        && importTypes.every(importType => importType === 'default' || importType === 'named')
+      ) {
+        let defaultImportNames = _.uniq(
+          _.compact(
+            (previouslyImportInfos?.map(previouslyImportInfo => {
+              if (previouslyImportInfo.importType === 'default') {
+                return previouslyImportInfo.identifier;
+              }
+
+              return undefined;
+            }) ?? []
+            ).concat(
+              groups['default']?.map(defaultImportInfo => defaultImportInfo.localIdentifier)
+              ?? []
+            )
+          )
+        );
+
+        return defaultImportNames.length <= 1;
+      }
+
+      let allImportTypes = _.uniq(importTypes.concat(
+        previouslyImportInfos?.map(previouslyImportInfo => previouslyImportInfo.importType)
+        ?? []
+      ));
+
+      if (allImportTypes.length > 1
+        || (allImportTypes[0] !== 'named' && groups[allImportTypes[0]].length >1)
       ) {
         return false;
-      }
-
-      if (!previouslyImportInfos) {
-        return true;
-      }
-
-      let identifierName = groups[importTypes[0]][0].localIdentifier.name;
-
-      for (let info of previouslyImportInfos) {
-        if (info.importType !== importTypes[0]) {
-          return false;
-        }
-
-        if (info.importType !== 'named') {
-          if (info.identifier.name !== identifierName) {
-            return false;
-          }
-        }
       }
 
       return true;
@@ -527,16 +536,14 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         }
 
         // This file was added previously in analysis scope
-        if (reportInfo) {
-          if (
-            // There are multiple import type, not allowed by default
-            importTypes.length !== 1 ||
-            // TODO (ooyyloo): Is this case exist in real world?
-            (importTypes[0] !== 'named' &&
-              importTypeToInfoDict[importTypes[0]].length !== 1)
-          ) {
-            reportErrors(importInfos);
+        if (!checkDefaultUnity(
+          importTypeToInfoDict,
+          reportInfo?.importIdentifyInfos,
+          {importTypes}
+        )) {
+          reportErrors(importInfos);
 
+          if (reportInfo) {
             reportInfo.reported = true;
 
             if (reportInfo.importIdentifyInfos) {
@@ -548,62 +555,32 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
               reportInfo.importIdentifyInfos = undefined;
             }
-          } else {
-            if (
-              !checkUnity(
-                importTypeToInfoDict,
-                reportInfo.importIdentifyInfos,
-                {
-                  importTypes,
-                },
-              )
-            ) {
-              reportErrors(importInfos);
-
-              reportPreviousErrors(
-                importTypes,
-                importTypeToInfoDict,
-                reportInfo.importIdentifyInfos!,
-              );
-
-              reportInfo.reported = true;
-              reportInfo.importIdentifyInfos = undefined;
-            } else {
-              reportInfo.importIdentifyInfos = (
-                reportInfo.importIdentifyInfos || []
-              ).concat([
-                {
-                  filename: context.getFilename(),
-                  importType: importTypes[0],
-                  identifier: importInfos[0].localIdentifier,
-                },
-              ]);
-            }
           }
-        } else {
-          if (
-            importTypes.length !== 1 ||
-            (importTypes[0] !== 'named' &&
-              importTypeToInfoDict[importTypes[0]].length !== 1)
-          ) {
-            reportErrors(importInfos);
-
+          else {
             modulePathToReportInfoMap.set(path, {
               reported: true,
               importIdentifyInfos: undefined,
             });
+          }
+        } else {
+          if (reportInfo) {
+            reportInfo.importIdentifyInfos = (
+              reportInfo.importIdentifyInfos || []
+            ).concat([
+              {
+                filename: context.getFilename(),
+                importType: importTypes[0],
+                identifier: importInfos[0].localIdentifier,
+              },
+            ]);
           } else {
-            // only one kind of import type and only one identifier
-
             modulePathToReportInfoMap.set(path, {
               reported: false,
-              importIdentifyInfos: [
-                {
-                  importType: importInfos[0].importType,
-                  identifier: importInfos[0].localIdentifier,
-                  filename: context.getFilename(),
-                },
-              ],
+              importIdentifyInfos: importInfos.map(importInfo => ({
+                filename: context.getFilename(),
+                importType: importInfo.importType,
+                identifier: importInfo.localIdentifier
+              })),
             });
           }
         }
@@ -617,9 +594,10 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
           exception => exception.module === moduleSpecifier,
         )?.allow;
 
-        if (!quickConfig && !allowedTypeInfos) {
-          return;
-        }
+        // "isConfiguredModule" checked already.
+        // if (!quickConfig && !allowedTypeInfos) {
+        //   return;
+        // }
 
         for (let importType of importTypes) {
           for (let {
@@ -637,29 +615,36 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               switch (importType) {
                 case 'default':
                   if (
-                    isNamingTypeMatch(
+                    !isNamingTypeMatch(
                       defaultImportNamingType ?? 'as-is',
                       moduleSpecifier,
                       localIdentifier.name,
                     )
                   ) {
-                    continue;
+                    context.report({
+                      node: localIdentifier,
+                      messageId: 'importTypeNotUnified',
+                    });
                   }
 
-                  break;
+                  continue;
+
                 case 'named':
                   if (
-                    isNamingTypeMatch(
+                    !isNamingTypeMatch(
                       namedImportNamingType ?? 'as-is',
                       // Always exist in named import
                       importedIdentifier!.name,
                       localIdentifier.name,
                     )
                   ) {
-                    continue;
+                    context.report({
+                      node: localIdentifier,
+                      messageId: 'importTypeNotUnified',
+                    });
                   }
 
-                  break;
+                  continue;
               }
             }
 
@@ -734,7 +719,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
       return {
         ImportDeclaration: declaration => {
-          let moduleSpecifier = declaration.source.value as string | null; // TODO (ooyyloo): When it will be null?
+          let moduleSpecifier = declaration.source.value as string | null; // TODO (ooyyloo): When will it be null?
 
           if (declaration.source.type !== 'Literal' || !moduleSpecifier) {
             return;
@@ -758,19 +743,13 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
           let moduleSpecifier = moduleReference.expression.value as
             | string
-            | null; // TODO (ooyyloo): When it will be null?
+            | null; // TODO (ooyyloo): When will it be null?
 
           if (!moduleSpecifier) {
             return;
           }
 
-          let importInfos: ImportInfo[] = [
-            {
-              importType: 'equals',
-              localIdentifier: declaration.id,
-              importedIdentifier: undefined,
-            },
-          ];
+          let importInfos = resolveEveryImportTypeAndIdentifier(declaration);
 
           addAndReportUnificationErrors(moduleSpecifier, importInfos, {
             baseUrlDirName,
@@ -780,7 +759,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     } else {
       return {
         ImportDeclaration: declaration => {
-          let moduleSpecifier = declaration.source.value as string | null; // TODO (ooyyloo): When it will be null?
+          let moduleSpecifier = declaration.source.value as string | null; // TODO (ooyyloo): When will it be null?
 
           if (declaration.source.type !== 'Literal' || !moduleSpecifier) {
             return;

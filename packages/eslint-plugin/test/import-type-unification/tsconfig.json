@@ -1,4 +1,6 @@
 {
-  "baseUrl": ".",
-  "esModuleInterop": true
+  "compilerOptions": {
+    "baseUrl": ".",
+    "esModuleInterop": true
+  }
 }

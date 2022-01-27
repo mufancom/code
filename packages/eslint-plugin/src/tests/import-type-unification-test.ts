@@ -13,7 +13,7 @@ const RULE_DIR = _getTestsDirPath('import-type-unification');
 
 const getTestFilePath = _getTestFileFullPath.bind(undefined, RULE_DIR);
 
-const getTestFile = _getTestFileContent.bind(undefined, RULE_DIR);
+const getTestFileContent = _getTestFileContent.bind(undefined, RULE_DIR);
 
 const ruleTester1 = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -29,7 +29,7 @@ ruleTester1.run('import-type-unification', rules['import-type-unification'], {
   valid: [],
   invalid: [
     {
-      code: getTestFile('test1.ts'),
+      code: getTestFileContent('test1.ts'),
       filename: getTestFilePath('test1.ts'),
       errors: [
         {messageId: 'importTypeNotUnified', line: 1},
@@ -37,7 +37,7 @@ ruleTester1.run('import-type-unification', rules['import-type-unification'], {
       ],
     },
     {
-      code: getTestFile('test2.ts'),
+      code: getTestFileContent('test2.ts'),
       filename: getTestFilePath('test2.ts'),
       errors: [
         {messageId: 'importTypeNotUnified', line: 5},
@@ -45,7 +45,7 @@ ruleTester1.run('import-type-unification', rules['import-type-unification'], {
       ],
     },
     {
-      code: getTestFile('test3.ts'),
+      code: getTestFileContent('test3.ts'),
       filename: getTestFilePath('test3.ts'),
       options: [
         {
@@ -82,7 +82,7 @@ ruleTester1.run('import-type-unification', rules['import-type-unification'], {
       ],
     },
     {
-      code: getTestFile('test4.ts'),
+      code: getTestFileContent('test4.ts'),
       filename: getTestFilePath('test4.ts'),
       options: [
         {
@@ -146,7 +146,7 @@ ruleTester2.run(
   {
     valid: [
       {
-        code: getTestFile('test2.js'),
+        code: getTestFileContent('test2.js'),
         filename: getTestFilePath('test2.js'),
         options: [
           {
@@ -162,7 +162,7 @@ ruleTester2.run(
     ],
     invalid: [
       {
-        code: getTestFile('test1.js'),
+        code: getTestFileContent('test1.js'),
         filename: getTestFilePath('test1.js'),
         errors: [
           {messageId: 'importTypeNotUnified', line: 1},
@@ -170,7 +170,7 @@ ruleTester2.run(
         ],
       },
       {
-        code: getTestFile('test3.js'),
+        code: getTestFileContent('test3.js'),
         filename: getTestFilePath('test3.js'),
         options: [
           {
