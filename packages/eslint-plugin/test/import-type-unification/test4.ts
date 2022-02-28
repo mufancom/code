@@ -3,7 +3,7 @@
 */
 
 // Test allowDefaultAndNamedImport disabled
-import http, {a} from 'http';
+import FS, {a} from 'fs';
 
 // Test allowDefaultAndNamedImport enabled
 import https, {b} from 'https';

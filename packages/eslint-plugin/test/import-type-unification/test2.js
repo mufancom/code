@@ -1,2 +1,2 @@
-import a from 'fs';
-import * as b from 'fs';
+import a from 'typescript';
+import * as b from 'typescript';
