@@ -1,4 +1,4 @@
-import {TSESTree} from '@typescript-eslint/experimental-utils';
+import {TSESTree} from '@typescript-eslint/utils';
 
 import {
   ImportKind,
@@ -29,7 +29,6 @@ export const importPathBaseUrlRule = createRule<Options, MessageId>({
   meta: {
     docs: {
       description: 'Check import module from baseUrl',
-      category: 'Stylistic Issues',
       recommended: 'error',
     },
     messages,

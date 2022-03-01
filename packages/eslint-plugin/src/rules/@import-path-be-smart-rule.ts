@@ -1,6 +1,6 @@
 import Path from 'path';
 
-import {TSESTree} from '@typescript-eslint/experimental-utils';
+import {TSESTree} from '@typescript-eslint/utils';
 import {format} from 'module-lens';
 
 import {
@@ -25,7 +25,6 @@ export const importPathBeSmartRule = createRule<Options, MessageId>({
     docs: {
       description:
         'Check to if import path is a shortest path and provide fixer.',
-      category: 'Best Practices',
       recommended: 'error',
     },
     messages,

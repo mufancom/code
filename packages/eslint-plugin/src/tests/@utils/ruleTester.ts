@@ -1,2 +1,2 @@
-import {TSESLint} from '@typescript-eslint/experimental-utils';
+import {TSESLint} from '@typescript-eslint/utils';
 export const RuleTester = TSESLint.RuleTester;

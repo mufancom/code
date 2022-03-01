@@ -1,4 +1,4 @@
-import {TSESLint} from '@typescript-eslint/experimental-utils';
+import {TSESLint} from '@typescript-eslint/utils';
 import {getNextStatement, isBlockLike} from 'tsutils';
 import {
   Block,
@@ -69,7 +69,6 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
     docs: {
       description:
         'Validate and insert appropriate empty lines around block-included statements',
-      category: 'Stylistic Issues',
       recommended: 'error',
     },
     messages,

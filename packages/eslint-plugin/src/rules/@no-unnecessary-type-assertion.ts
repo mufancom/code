@@ -37,7 +37,6 @@ export const noUnnecessaryTypeAssertionRule = createRule<Options, MessageId>({
     docs: {
       description:
         'Warns if a type assertion does not change the type of an expression.',
-      category: 'Best Practices',
       recommended: 'error',
     },
     messages,

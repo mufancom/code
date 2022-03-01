@@ -1,6 +1,6 @@
 import Path from 'path';
 
-import {RuleTesterConfig} from '@typescript-eslint/experimental-utils/dist/ts-eslint';
+import {RuleTesterConfig} from '@typescript-eslint/utils/dist/ts-eslint';
 
 import {rules} from '../rules';
 

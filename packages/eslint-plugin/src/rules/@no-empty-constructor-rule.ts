@@ -1,4 +1,4 @@
-import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/experimental-utils';
+import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/utils';
 
 import {createRule} from './@utils';
 
@@ -17,7 +17,6 @@ export const noEmptyConstructorRule = createRule<Options, MessageId>({
   meta: {
     docs: {
       description: '',
-      category: 'Best Practices',
       recommended: 'error',
     },
     messages,

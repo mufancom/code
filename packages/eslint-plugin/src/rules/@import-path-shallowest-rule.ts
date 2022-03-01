@@ -1,6 +1,6 @@
 import Path from 'path';
 
-import {TSESTree} from '@typescript-eslint/experimental-utils';
+import {TSESTree} from '@typescript-eslint/utils';
 
 import {
   ImportKind,
@@ -33,7 +33,6 @@ export const importPathShallowestRule = createRule<Options, MessageId>({
     docs: {
       description:
         'Validate import expression of path that directory module path whether module under the path or not',
-      category: 'Best Practices',
       recommended: 'error',
     },
     messages,

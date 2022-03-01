@@ -1,6 +1,6 @@
 import Path from 'path';
 
-import {TSESTree} from '@typescript-eslint/experimental-utils';
+import {TSESTree} from '@typescript-eslint/utils';
 
 import {
   ImportKind,
@@ -25,7 +25,6 @@ export const importPathNoParentRule = createRule<Options, MessageId>({
   meta: {
     docs: {
       description: '',
-      category: 'Possible Errors',
       recommended: 'error',
     },
     messages,

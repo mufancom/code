@@ -1,4 +1,4 @@
-import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/experimental-utils';
+import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/utils';
 import * as jsdiff from 'diff';
 import _ from 'lodash';
 import TypeScript from 'typescript';
@@ -19,7 +19,6 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
     docs: {
       description:
         'Check if the order of object keys matchs the order of the type',
-      category: 'Stylistic Issues',
       recommended: 'error',
     },
     messages,

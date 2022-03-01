@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import {TSESLint, TSESTree} from '@typescript-eslint/experimental-utils';
+import {TSESLint, TSESTree} from '@typescript-eslint/utils';
 import {
   isExternalModuleReference,
   isImportDeclaration,
@@ -69,7 +69,6 @@ export const orderedImportsRule = createRule<Options, MessageId>({
     docs: {
       description:
         'Requires that import statements be alphabetized and grouped.',
-      category: 'Stylistic Issues',
       recommended: 'error',
     },
     messages,
@@ -148,7 +147,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
 
     let reportDescriptors: {
       node?: TSESTree.Node;
-      loc?: TSESTree.SourceLocation | TSESTree.LineAndColumnData;
+      loc?: TSESTree.SourceLocation | TSESTree.Position;
       messageId: MessageId;
       lastFix: FixFunction[];
     }[] = [];

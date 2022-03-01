@@ -35,9 +35,9 @@
     "typescript": "^3.5.3 || ^4"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^3.5.0",
-    "@typescript-eslint/experimental-utils": "^3.5.0",
-    "@typescript-eslint/parser": "^3.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.13.0",
+    "@typescript-eslint/utils": "^5.13.0",
+    "@typescript-eslint/parser": "^5.13.0",
     "diff": "^4.0.2",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-no-null": "^1.0.2",

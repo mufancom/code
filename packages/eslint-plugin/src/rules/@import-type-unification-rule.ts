@@ -1,12 +1,12 @@
 import FS from 'fs';
 import Path from 'path';
 
-import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/experimental-utils';
+import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/utils';
 import {
   RuleMetaData,
   RuleMetaDataDocs,
   RuleFunction,
-} from '@typescript-eslint/experimental-utils/dist/ts-eslint/Rule';
+} from '@typescript-eslint/utils/dist/ts-eslint/Rule';
 import {SourceCode} from 'eslint';
 import _ from 'lodash';
 import {resolveWithCategory} from 'module-lens';
