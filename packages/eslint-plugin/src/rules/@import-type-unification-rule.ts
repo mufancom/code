@@ -10,17 +10,9 @@ import {
 import {SourceCode} from 'eslint';
 import _ from 'lodash';
 import {resolveWithCategory} from 'module-lens';
-import {Field, MapField, Message, Type} from 'protobufjs';
 import {Dict} from 'tslang';
 
 import {RequiredParserServices, createRule, gentleStat} from './@utils';
-
-/*
-  TODO
-
-  1. Improve readability of importTypeNotUnifiedPreviously
-  2. Use different message id to distinction quick config naming type issue
-*/
 
 type CreateRuleMeta<TMessageIds extends string> = {
   docs: Omit<RuleMetaDataDocs, 'url'>;
@@ -106,93 +98,65 @@ type ImportInfo = (
   declaration: ConcernedDeclaration;
 };
 
-@Type.d('LineAndColumnData')
-class LineAndColumnData extends Message<LineAndColumnData> {
-  @Field.d(1, 'int32')
+class LineAndColumnData {
   line!: number;
 
-  @Field.d(2, 'int32')
   column!: number;
 }
 
-@Type.d('SourceLocation')
-class SourceLocation extends Message<SourceLocation> {
-  @Field.d(1, LineAndColumnData)
+class SourceLocation {
   start!: LineAndColumnData;
 
-  @Field.d(2, LineAndColumnData)
   end!: LineAndColumnData;
 }
 
-@Type.d('Identifier')
-class Identifier extends Message<Identifier> {
-  @Field.d(1, 'string')
+class Identifier {
   type!: AST_NODE_TYPES.Identifier;
 
-  @Field.d(2, 'string')
   name!: string;
 
-  @Field.d(3, 'int32', 'repeated')
   range!: [number, number];
 
-  @Field.d(4, SourceLocation)
   loc!: SourceLocation;
 }
 
-@Type.d('Declaration')
-class Declaration extends Message<Declaration> {
-  @Field.d(1, 'int32', 'repeated')
+class Declaration {
   range!: [number, number];
 
-  @Field.d(2, SourceLocation)
   loc!: SourceLocation;
 }
 
-@Type.d('ImportIdentifyInfo')
-class ImportIdentifyInfo extends Message<ImportIdentifyInfo> {
-  @Field.d(1, 'bool')
+class ImportIdentifyInfo {
   reported!: boolean;
 
-  @Field.d(2, 'string')
   importType!: ImportType;
 
-  @Field.d(3, 'string')
   filePath!: string;
 
-  @Field.d(4, Identifier, 'optional')
   identifier?: Identifier | undefined;
 
-  @Field.d(5, Identifier, 'optional')
   importedIdentifier?: Identifier | undefined;
 
-  @Field.d(6, Declaration)
   declaration!: Declaration;
 }
 
-@Type.d('ReportInfo')
-class ReportInfo extends Message<ReportInfo> {
-  @Field.d(1, ImportIdentifyInfo, 'repeated')
+class ReportInfo {
   importIdentifyInfos!: ImportIdentifyInfo[]; // TODO (ooyyloo): remove "!"
 
-  @Field.d(2, 'string')
   moduleSpecifier!: string;
 }
 
 // 相对于项目目录的路径, win32格式
-@Type.d('ModulePaths')
-class ModulePaths extends Message<ModulePaths> {
-  @Field.d(1, 'string', 'repeated')
+
+class ModulePaths {
   modulePaths!: string[];
 }
 
-@Type.d('Cache')
-class Cache extends Message<Cache> {
-  @MapField.d(1, 'string', ReportInfo)
-  modulePathToReportInfoDict!: Dict<ReportInfo>;
+// class Cache {
+//   modulePathToReportInfoDict!: Dict<ReportInfo>;
 
-  @MapField.d(2, 'string', ModulePaths)
-  filePathToModulePaths!: Dict<ModulePaths>; // filePath为相对于项目目录的路径, win32格式
-}
+//   filePathToModulePaths!: Dict<ModulePaths>; // filePath为相对于项目目录的路径, win32格式
+// }
 
 const messages = {
   importTypeNotUnified:
@@ -360,7 +324,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     let cachePath = Path.win32.resolve(
       projectPath,
       options.cacheDir,
-      'cache.protobuf',
+      'cache.itur',
     );
 
     let cachePathStats = gentleStat(cachePath);
@@ -368,7 +332,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     if (cachePathStats?.isFile()) {
       let cacheFilebuffer = FS.readFileSync(cachePath);
 
-      let cache = Cache.decode(cacheFilebuffer);
+      let cache = JSON.parse(cacheFilebuffer.toString());
 
       modulePathToReportInfoDict = cache.modulePathToReportInfoDict;
       filePathToModulePaths = cache.filePathToModulePaths;
@@ -396,9 +360,9 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       if (newModulePaths.length === 0) {
         delete filePathToModulePaths[filePath];
       } else {
-        filePathToModulePaths[filePath] = new ModulePaths({
+        filePathToModulePaths[filePath] = {
           modulePaths: newModulePaths,
-        });
+        };
       }
     }
 
@@ -480,13 +444,13 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       );
     }
 
-    let message = new Cache({
+    let message = {
       modulePathToReportInfoDict,
       filePathToModulePaths,
-    });
-    let encodeBytes = Cache.encode(message).finish();
+    };
+    let encodeString = JSON.stringify(message);
 
-    FS.writeFileSync(cachePath, encodeBytes);
+    FS.writeFileSync(cachePath, encodeString);
 
     return {};
 
@@ -643,15 +607,15 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     }
 
     function newIdentifier(TSESIdentifier: TSESTree.Identifier): Identifier {
-      return new Identifier({
+      return {
         type: AST_NODE_TYPES.Identifier,
         name: TSESIdentifier.name,
         range: TSESIdentifier.range,
-        loc: new SourceLocation({
-          start: new LineAndColumnData(TSESIdentifier.loc.start),
-          end: new LineAndColumnData(TSESIdentifier.loc.end),
-        }),
-      });
+        loc: {
+          start: TSESIdentifier.loc.start,
+          end: TSESIdentifier.loc.end,
+        },
+      };
     }
 
     function checkDefaultUnity(importTypes: string[]): boolean {
@@ -696,6 +660,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         },
       });
 
+      let reportedImportInfo = importIdentifyInfo;
+
       let notReportedImportTypeToImportIdentifyInfos =
         notReportedImportTypeToImportIdentifyInfosDict[importType];
 
@@ -716,6 +682,10 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               },
             });
           } else {
+            if (reportedImportInfo && _.isEqual(reportedImportInfo, info)) {
+              continue;
+            }
+
             context.report({
               node: identifier,
               messageId: reportMessageId,
@@ -759,12 +729,10 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       let reportInfo = modulePathToReportInfoDict[moduleRelativePath];
 
       if (!reportInfo) {
-        reportInfo = modulePathToReportInfoDict[
-          moduleRelativePath
-        ] = new ReportInfo({
+        reportInfo = modulePathToReportInfoDict[moduleRelativePath] = {
           importIdentifyInfos: [],
           moduleSpecifier: moduleSpecifier,
-        });
+        };
       }
 
       let quickConfig = options.quickConfigs?.find(config =>
@@ -784,21 +752,21 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
             moduleRelativePath,
           ]);
         } else {
-          filePathToModulePaths[filePath] = new ModulePaths({
+          filePathToModulePaths[filePath] = {
             modulePaths: [moduleRelativePath],
-          });
+          };
         }
 
         info.filePath = filePath;
         info.reported = false;
         info.importType = importInfo.importType;
-        info.declaration = new Declaration({
+        info.declaration = {
           range: importInfo.declaration.range,
-          loc: new SourceLocation({
-            start: new LineAndColumnData(importInfo.declaration.loc.start),
-            end: new LineAndColumnData(importInfo.declaration.loc.end),
-          }),
-        });
+          loc: {
+            start: importInfo.declaration.loc.start,
+            end: importInfo.declaration.loc.end,
+          },
+        };
 
         switch (importInfo.importType) {
           case 'default':
@@ -900,6 +868,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
           } else {
             info.reported = true;
 
+            let reportedImportInfo: ImportIdentifyInfo | undefined;
+
             for (let anotherImportType of importTypes) {
               if (anotherImportType !== importType) {
                 let anotherImportIdentifyInfo =
@@ -936,6 +906,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
                   });
                 }
 
+                reportedImportInfo = anotherImportIdentifyInfo;
+
                 break;
               }
             }
@@ -951,6 +923,15 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
                   }
 
                   anotherInfo.reported = true;
+
+                  if (anotherInfo.filePath !== filePath) {
+                    if (
+                      reportedImportInfo &&
+                      _.isEqual(anotherInfo, reportedImportInfo)
+                    ) {
+                      continue;
+                    }
+                  }
 
                   let reportInfo =
                     anotherInfo.filePath === filePath ? info : anotherInfo;
