@@ -212,7 +212,7 @@ interface ConfigOption {
 
 type Options = [
   {
-    cacheDir: string;
+    cachePath: string;
     quickConfigs?: QuickConfigOptions[];
     configs?: ConfigOption[];
   },
@@ -232,9 +232,9 @@ const ruleBody = {
     schema: [
       {
         type: 'object',
-        required: ['cacheDir'],
+        required: ['cachePath'],
         properties: {
-          cacheDir: {
+          cachePath: {
             type: 'string',
           },
           quickConfigs: {
@@ -313,7 +313,7 @@ const ruleBody = {
 
 export const importTypeUnificationRule = createRule<Options, MessageId>({
   ...ruleBody,
-  defaultOptions: [{cacheDir: '.'}],
+  defaultOptions: [{cachePath: './.cache/rules/import-type-unification'}],
   create(context, [options]) {
     let projectPath = process.cwd();
     let filePath = Path.win32.relative(projectPath, context.getFilename());
@@ -323,9 +323,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
     let cachePath = Path.win32.resolve(
       projectPath,
-      options.cacheDir,
-      'cache.itur',
-    );
+      options.cachePath,
+    ).replace(/\\/g, '/');
 
     let cachePathStats = gentleStat(cachePath);
 
@@ -339,7 +338,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     } else if (cachePathStats?.isDirectory()) {
       throw new Error('Intended cache path is occupied by a directory');
     } else {
-      FS.mkdirSync(options.cacheDir, {recursive: true});
+      FS.mkdirSync(Path.dirname(cachePath), {recursive: true});
     }
 
     let newModulePaths = [];

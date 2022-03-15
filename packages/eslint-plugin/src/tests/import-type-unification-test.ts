@@ -17,6 +17,10 @@ const getTestFilePath = _getTestFileFullPath.bind(undefined, RULE_DIR);
 
 const getTestFileContent = _getTestFileContent.bind(undefined, RULE_DIR);
 
+function getCachePath(testFilePath: string): string {
+  return Path.join(Path.dirname(testFilePath), '.cache/rules/import-type-unification');
+}
+
 const ruleTester1 = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
   parserOptions: {
@@ -33,7 +37,7 @@ ruleTester1.run('import-type-unification', rules['import-type-unification'], {
     {
       code: getTestFileContent('test1.ts'),
       filename: getTestFilePath('test1.ts'),
-      options: [{cacheDir: Path.dirname(getTestFilePath('test1.ts'))}],
+      options: [{cachePath: getCachePath(getTestFilePath('test1.ts'))}],
       errors: [
         {messageId: 'importTypeNotUnified', line: 1},
         {messageId: 'importTypeNotUnified', line: 2},
@@ -42,7 +46,7 @@ ruleTester1.run('import-type-unification', rules['import-type-unification'], {
     {
       code: getTestFileContent('test2.ts'),
       filename: getTestFilePath('test2.ts'),
-      options: [{cacheDir: Path.dirname(getTestFilePath('test2.ts'))}],
+      options: [{cachePath: getCachePath(getTestFilePath('test2.ts'))}],
       errors: [
         {messageId: 'importTypeNotUnified', line: 5},
         {messageId: 'importTypeNotUnified', line: 6},
@@ -53,7 +57,7 @@ ruleTester1.run('import-type-unification', rules['import-type-unification'], {
       filename: getTestFilePath('test3.ts'),
       options: [
         {
-          cacheDir: Path.dirname(getTestFilePath('test3.ts')),
+          cachePath: getCachePath(getTestFilePath('test3.ts')),
           configs: [
             {
               module: 'http',
@@ -83,7 +87,7 @@ ruleTester1.run('import-type-unification', rules['import-type-unification'], {
       filename: getTestFilePath('test4.ts'),
       options: [
         {
-          cacheDir: Path.dirname(getTestFilePath('test4.ts')),
+          cachePath: getCachePath(getTestFilePath('test4.ts')),
           quickConfigs: [
             {
               modules: ['https'],
@@ -136,7 +140,7 @@ ruleTester2.run(
         filename: getTestFilePath('test2.js'),
         options: [
           {
-            cacheDir: Path.dirname(getTestFilePath('test2.js')),
+            cachePath: getCachePath(getTestFilePath('test2.js')),
             configs: [
               {
                 module: 'typescript',
@@ -151,7 +155,7 @@ ruleTester2.run(
         filename: getTestFilePath('test3.js'),
         options: [
           {
-            cacheDir: Path.dirname(getTestFilePath('test3.js')),
+            cachePath: getCachePath(getTestFilePath('test3.js')),
             configs: [
               {
                 module: './foo',
@@ -166,7 +170,7 @@ ruleTester2.run(
       {
         code: getTestFileContent('test1.js'),
         filename: getTestFilePath('test1.js'),
-        options: [{cacheDir: Path.dirname(getTestFilePath('test1.js'))}],
+        options: [{cachePath: getCachePath(getTestFilePath('test1.js'))}],
         errors: [
           {messageId: 'importTypeNotUnified', line: 1},
           {messageId: 'importTypeNotUnified', line: 2},

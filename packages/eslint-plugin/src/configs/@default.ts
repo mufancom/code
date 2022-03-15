@@ -9,17 +9,11 @@ let plugins = [
   'react-hooks',
 ];
 
-let additionRules: Dict<string> = {};
-
 if (require.main) {
   if (
     /[\\/]\.vscode(?:-server)?[\\/]extensions[\\/]/.test(require.main.filename)
   ) {
     plugins.push('only-warn');
-  }
-
-  if (require.main.filename.includes('eslint/bin/eslint.js')) {
-    additionRules['@mufan/import-type-unification'] = 'error';
   }
 }
 
@@ -37,7 +31,6 @@ export const defaultConfig = {
   plugins,
   ignorePatterns: ['.eslintrc.js'],
   rules: {
-    ...additionRules,
     '@mufan/empty-line-around-blocks': 'error',
     '@mufan/import-groups': [
       'error',
@@ -435,6 +428,7 @@ export const defaultConfig = {
       rules: {
         '@mufan/explicit-return-type': 'error',
         '@mufan/import-path-base-url': 'off',
+        "@mufan/import-type-unification": ["error", {"cachePath": "node_modules/@mufan/eslint-plugin/.cache/rules/import-type-unification"}],
         '@mufan/no-unnecessary-type-assertion': 'error',
         '@mufan/strict-key-order': 'error',
         '@typescript-eslint/adjacent-overload-signatures': 'error',
