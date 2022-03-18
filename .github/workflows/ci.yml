@@ -21,7 +21,7 @@ jobs:
   test:
     strategy:
       matrix:
-        node: [10, 12]
+        node: [14, 16]
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2

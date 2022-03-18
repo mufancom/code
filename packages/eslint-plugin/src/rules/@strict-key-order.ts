@@ -18,7 +18,7 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
   meta: {
     docs: {
       description:
-        'Check if the order of object keys matchs the order of the type',
+        'Check if the order of object keys matches the order of the type',
       recommended: 'error',
     },
     messages,
@@ -83,9 +83,12 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
         typeAnnotation.typeAnnotation,
       );
 
-      let typeKeys = mapIteratorToArray(
-        typeChecker.getTypeAtLocation(typeNode).symbol.members!.keys(),
-      );
+      let typeNodeMembers = typeChecker.getTypeAtLocation(typeNode).symbol
+        .members;
+
+      let typeKeys = typeNodeMembers
+        ? mapIteratorToArray(typeNodeMembers.keys())
+        : [];
 
       let propertyKeyInfos: PropertyKeyInfo[] = _.compact(
         init.properties.map((property, index) => {

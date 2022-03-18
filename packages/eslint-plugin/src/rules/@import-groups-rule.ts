@@ -175,7 +175,7 @@ export const importGroupsRule = createRule<Options, MessageId>({
 
     class ImportGroupWalker {
       private moduleImportInfos: ModuleImportInfo[] = [];
-      private pendingStatements: TSESTree.Statement[] = [];
+      private pendingStatements: TSESTree.ProgramStatement[] = [];
 
       private moduleSpecifierHelper = new ModuleSpecifierHelper(
         context.getFilename(),
@@ -183,7 +183,7 @@ export const importGroupsRule = createRule<Options, MessageId>({
       );
 
       walk(): void {
-        let pendingCache: TSESTree.Statement[] = [];
+        let pendingCache: TSESTree.ProgramStatement[] = [];
 
         let checkWithAppendModuleImport = (
           expression: TSESTree.Expression,

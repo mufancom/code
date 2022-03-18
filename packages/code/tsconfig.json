@@ -11,10 +11,9 @@
 
     "strict": true,
     "strictFunctionTypes": false,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "useDefineForClassFields": true,
 
     "newLine": "LF"
   }

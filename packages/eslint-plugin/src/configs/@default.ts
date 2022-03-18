@@ -83,6 +83,7 @@ export const defaultConfig = {
     '@mufan/import-path-shallowest': 'error',
     '@mufan/import-path-strict-hierarchy': 'off',
     '@mufan/no-empty-constructor': 'error',
+    '@mufan/no-object-literal-type-assertion': 'error',
     '@mufan/ordered-imports': [
       'error',
       {
@@ -271,7 +272,7 @@ export const defaultConfig = {
     'no-new-require': 'off',
     'no-new-symbol': 'off',
     'no-new-wrappers': 'error',
-    'no-null/no-null': 'error',
+    'no-null/no-null': 'off',
     'no-obj-calls': 'off',
     'no-octal': 'off',
     'no-octal-escape': 'off',
@@ -368,8 +369,9 @@ export const defaultConfig = {
     'quote-props': 'off',
     quotes: 'off',
     radix: 'off',
-    'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'error',
+    'react-hooks/rules-of-hooks': 'error',
+    'react/jsx-uses-vars': 'error',
     'react/self-closing-comp': [
       'error',
       {
@@ -529,7 +531,13 @@ export const defaultConfig = {
         '@typescript-eslint/no-unnecessary-qualifier': 'error',
         '@typescript-eslint/no-unnecessary-type-arguments': 'error',
         '@typescript-eslint/no-unnecessary-type-assertion': 'off',
-        '@typescript-eslint/no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          {
+            varsIgnorePattern: '^_',
+            argsIgnorePattern: '^_',
+          },
+        ],
         '@typescript-eslint/no-use-before-define': 'off',
         '@typescript-eslint/no-useless-constructor': 'off',
         '@typescript-eslint/prefer-function-type': 'error',

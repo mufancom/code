@@ -10,6 +10,7 @@ import {
   getFullStart,
   getModuleSpecifier,
   hasKnownModuleFileExtension,
+  isRelativeModuleSpecifier,
   removeModuleFileExtension,
 } from './@utils';
 
@@ -153,7 +154,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
     function validateIndexFile(infos: ModuleStatementInfo[]): void {
       let fileName = context.getFilename();
       let dirName = Path.dirname(fileName);
-      let fileNames;
+      let fileNames: string[];
 
       try {
         fileNames = FS.readdirSync(dirName);
@@ -313,22 +314,34 @@ export const scopedModulesRule = createRule<Options, MessageId>({
         })
         .filter((entryName): entryName is string => !!entryName);
 
-      let missingExportIds = _.difference(
+      let missingExportSpecifiers = _.difference(
         expectedExportSpecifiers,
-        exportSpecifiers,
+        exportSpecifiers.map(specifier =>
+          isRelativeModuleSpecifier(specifier)
+            ? removeModuleFileExtension(specifier)
+            : specifier,
+        ),
       );
 
-      if (missingExportIds.length) {
+      if (missingExportSpecifiers.length) {
+        let jsExtension = exportSpecifiers.some(specifier =>
+          /\.js$/.test(specifier),
+        );
+
         context.report({
           node: context.getSourceCode().ast,
           messageId: 'missingExports',
-          fix: buildAddMissingExportsFixer(missingExportIds),
+          fix: buildAddMissingExportsFixer(
+            missingExportSpecifiers,
+            jsExtension,
+          ),
         });
       }
     }
 
     function buildAddMissingExportsFixer(
       nodesPath: string[],
+      jsExtension: boolean,
     ): TSESLint.ReportFixFunction {
       return fixer =>
         fixer.replaceTextRange(
@@ -336,7 +349,10 @@ export const scopedModulesRule = createRule<Options, MessageId>({
           `${[
             context.getSourceCode().getText().trimRight(),
             ...nodesPath.map(
-              value => `export * from '${removeModuleFileExtension(value)}';`,
+              value =>
+                `export * from '${removeModuleFileExtension(value)}${
+                  jsExtension ? '.js' : ''
+                }';`,
             ),
           ]
             .filter(text => !!text)

@@ -202,7 +202,7 @@ class ImportFinder {
     return this._result;
   }
 
-  private _findImports(statements: readonly TSESTree.Statement[]): void {
+  private _findImports(statements: readonly TSESTree.ProgramStatement[]): void {
     for (const statement of statements) {
       if (statement.type === AST_NODE_TYPES.ImportDeclaration) {
         if (this._options & ImportKind.ImportDeclaration) {
@@ -239,12 +239,24 @@ class ImportFinder {
       return;
     }
 
-    if (declaration.body.type === AST_NODE_TYPES.TSModuleDeclaration) {
-      this._findImportsInModule(declaration.body);
-      return;
+    let {
+      body: {type: declarationBodyType, body: statements},
+    } = declaration;
+
+    if (typeof statements === 'undefined') {
+      throw new Error('Unexpected declaration body with value undefined');
     }
 
-    this._findImports(declaration.body.body);
+    switch (declarationBodyType) {
+      case AST_NODE_TYPES.TSModuleBlock:
+        // Find import statements in module declaration's block body
+        this._findImports(statements as TSESTree.Statement[]);
+        break;
+      case AST_NODE_TYPES.TSModuleDeclaration:
+        return;
+      default:
+        throw new Error(`Unexpected AST node type ${declarationBodyType}`);
+    }
   }
 
   private _findNestedImports(): void {
