@@ -1,5 +1,3 @@
-import {Dict} from 'tslang';
-
 let plugins = [
   '@mufan/eslint-plugin',
   '@typescript-eslint',
