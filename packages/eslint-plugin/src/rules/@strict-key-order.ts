@@ -6,7 +6,7 @@ import TypeScript from 'typescript';
 import {createRule, getParserServices} from './@utils';
 
 const messages = {
-  wrongPosition: 'The key "{{key}}" is in wrong position.',
+  wrongPosition: 'The key "{{key}}" is at wrong position.',
 };
 
 type Options = [];
