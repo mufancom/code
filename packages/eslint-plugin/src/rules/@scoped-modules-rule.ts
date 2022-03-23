@@ -1,11 +1,7 @@
 import FS from 'fs';
 import Path from 'path';
 
-import {
-  AST_NODE_TYPES,
-  TSESLint,
-  TSESTree,
-} from '@typescript-eslint/experimental-utils';
+import {AST_NODE_TYPES, TSESLint, TSESTree} from '@typescript-eslint/utils';
 import _ from 'lodash';
 
 import {

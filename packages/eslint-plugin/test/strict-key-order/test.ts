@@ -1,3 +1,5 @@
+import { LocaleBundle } from "./locale-bundle";
+
 interface RawLocaleBundle {
   'm:keywords': string;
   'm:keywordsOfCategory2': string;
@@ -82,3 +84,8 @@ interface B {}
 let bb: B = {
   ...{},
 };
+
+export const en: /* strict-key-order */ LocaleBundle = {
+  'h:account:birthday': 'Birthday',
+  'h:account:bio': 'Bio',
+}

@@ -1,4 +1,4 @@
-import {TSESLint} from '@typescript-eslint/experimental-utils';
+import {TSESLint} from '@typescript-eslint/utils';
 import {getNextStatement, isBlockLike} from 'tsutils';
 import {
   Block,

@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Lint: ESLint Plugin",
+      "type": "shell",
+      "command": "yarn",
+      "args": ["lint"],
+      "options": {
+        "cwd": "${workspaceRoot}/packages/eslint-plugin"
+      },
+      "group": "test",
+      "problemMatcher": {
+        "base": "$eslint-stylish",
+        "owner": "eslint"
+      }
+    },
+    {
+      "label": "Test: ESLint Plugin",
+      "type": "shell",
+      "command": "yarn",
+      "args": ["test"],
+      "options": {
+        "cwd": "${workspaceRoot}/packages/eslint-plugin"
+      },
+      "group": "test"
+    }
+  ]
+}

@@ -7,11 +7,12 @@ let plugins = [
   'react-hooks',
 ];
 
-if (
-  require.main &&
-  /[\\/]\.vscode(?:-server)?[\\/]extensions[\\/]/.test(require.main.filename)
-) {
-  plugins.push('only-warn');
+if (require.main) {
+  if (
+    /[\\/]\.vscode(?:-server)?[\\/]extensions[\\/]/.test(require.main.filename)
+  ) {
+    plugins.push('only-warn');
+  }
 }
 
 export const defaultConfig = {
@@ -427,6 +428,7 @@ export const defaultConfig = {
       rules: {
         '@mufan/explicit-return-type': 'error',
         '@mufan/import-path-base-url': 'off',
+        "@mufan/import-type-unification": ["error", {"cachePath": "node_modules/@mufan/eslint-plugin/.cache/rules/import-type-unification"}],
         '@mufan/strict-key-order': 'error',
         '@typescript-eslint/adjacent-overload-signatures': 'error',
         '@typescript-eslint/array-type': [

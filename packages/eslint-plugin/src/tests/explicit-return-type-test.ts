@@ -24,14 +24,14 @@ const ruleTester = new RuleTester({
 ruleTester.run(RULE_NAME, rules[RULE_NAME], {
   valid: [
     {
-      code: getTestFileContent(TEST_DIR_PATH, 'test.tsx'),
-      filename: getTestFileFullPath(TEST_DIR_PATH, 'test.tsx'),
+      code: getTestFileContent(TEST_DIR_PATH, 'test2.tsx'),
+      filename: getTestFileFullPath(TEST_DIR_PATH, 'test2.tsx'),
     },
   ],
   invalid: [
     {
-      code: getTestFileContent(TEST_DIR_PATH, 'test.ts'),
-      filename: getTestFileFullPath(TEST_DIR_PATH, 'test.ts'),
+      code: getTestFileContent(TEST_DIR_PATH, 'test1.ts'),
+      filename: getTestFileFullPath(TEST_DIR_PATH, 'test1.ts'),
       errors: [
         {messageId: 'explicitReturnTypeRequired', line: 1},
         {messageId: 'explicitReturnTypeRequired', line: 2, column: 11},
@@ -53,7 +53,7 @@ ruleTester.run(RULE_NAME, rules[RULE_NAME], {
         {messageId: 'explicitReturnTypeRequired', line: 66, endLine: 68},
         {messageId: 'explicitReturnTypeRequired', line: 70, endLine: 72},
       ],
-      output: getTestFileContent(TEST_DIR_PATH, 'test.ts.fix'),
+      output: getTestFileContent(TEST_DIR_PATH, 'test1.ts.fix'),
     },
   ],
 });

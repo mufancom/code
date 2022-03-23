@@ -49,8 +49,8 @@ module.exports = {
 
 ```ts
 // 内建模块
-import * as FS from 'fs';
-import * as Path from 'path';
+import FS from 'fs';
+import Path from 'path';
 
 // 第三方模块
 import * as request from 'request';

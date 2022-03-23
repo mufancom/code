@@ -1,5 +1,5 @@
-import * as fs from 'fs'
-import * as path from 'path'
+import FS from 'fs'
+import Path from 'path'
 
 import * as url from 'url' // failure
 

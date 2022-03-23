@@ -1,12 +1,12 @@
-import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/experimental-utils';
+import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/utils';
 import * as jsdiff from 'diff';
-import * as _ from 'lodash';
-import ts from 'typescript';
+import _ from 'lodash';
+import TypeScript from 'typescript';
 
 import {createRule, getParserServices} from './@utils';
 
 const messages = {
-  wrongPosition: 'The key "{{key}}" is in wrong position.',
+  wrongPosition: 'The key "{{key}}" is at wrong position.',
 };
 
 type Options = [];
@@ -36,7 +36,9 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
     const parserServices = getParserServices(context);
     let typeChecker = parserServices.program.getTypeChecker();
 
-    function mapIteratorToArray(iterator: ts.Iterator<ts.__String>): string[] {
+    function mapIteratorToArray(
+      iterator: TypeScript.Iterator<TypeScript.__String>,
+    ): string[] {
       let result: string[] = [];
 
       for (

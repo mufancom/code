@@ -4,4 +4,14 @@ module.exports = {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,
   },
+  rules: {
+    "@mufan/import-type-unification": ["error", {
+      quickConfigs: [
+        {
+          modules: ['typescript'],
+          allowDefaultAndNamedImport: true
+        }
+      ]
+    }]
+  }
 };

@@ -1,4 +1,4 @@
-import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/experimental-utils';
+import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/utils';
 import {isNodeBuiltIn, resolveWithCategory} from 'module-lens';
 import {Dict} from 'tslang';
 
@@ -225,7 +225,7 @@ export const importGroupsRule = createRule<Options, MessageId>({
       }
 
       private appendModuleImport(
-        expression: TSESTree.LiteralExpression,
+        expression: TSESTree.Expression,
         sideEffect: boolean,
       ): void {
         let node: TSESTree.Node = expression;

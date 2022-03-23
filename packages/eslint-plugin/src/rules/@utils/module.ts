@@ -1,6 +1,6 @@
-import * as Path from 'path';
+import Path from 'path';
 
-import {TSESLint, TSESTree} from '@typescript-eslint/experimental-utils';
+import {TSESLint, TSESTree} from '@typescript-eslint/utils';
 import _ from 'lodash';
 import {
   ResolveWithCategoryResult,
@@ -92,7 +92,7 @@ export class ModuleSpecifierHelper {
 
 export function getModuleSpecifier(
   sourceCode: TSESLint.SourceCode,
-  node: TSESTree.LiteralExpression,
+  node: TSESTree.Expression,
 ): string {
   return eval(sourceCode.getText(node));
 }

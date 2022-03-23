@@ -1,6 +1,6 @@
-import * as Path from 'path';
+import Path from 'path';
 
-import {TSESTree} from '@typescript-eslint/experimental-utils';
+import {TSESTree} from '@typescript-eslint/utils';
 
 import {
   ImportKind,
