@@ -212,7 +212,7 @@ interface ConfigOption {
 
 type Options = [
   {
-    cachePath: string;
+    cachePath?: string;
     quickConfigs?: QuickConfigOptions[];
     configs?: ConfigOption[];
   },
@@ -232,10 +232,10 @@ const ruleBody = {
     schema: [
       {
         type: 'object',
-        required: ['cachePath'],
         properties: {
           cachePath: {
             type: 'string',
+            default: 'node_modules/@mufan/eslint-plugin/.cache/rules/import-type-unification',
           },
           quickConfigs: {
             type: 'array',
@@ -313,7 +313,7 @@ const ruleBody = {
 
 export const importTypeUnificationRule = createRule<Options, MessageId>({
   ...ruleBody,
-  defaultOptions: [{cachePath: './.cache/rules/import-type-unification'}],
+  defaultOptions: [{cachePath: 'node_modules/@mufan/eslint-plugin/.cache/rules/import-type-unification'}],
   create(context, [options]) {
     let projectPath = process.cwd();
     let filePath = Path.win32.relative(projectPath, context.getFilename());
@@ -323,7 +323,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
     let cachePath = Path.win32.resolve(
       projectPath,
-      options.cachePath,
+      options.cachePath!,
     ).replace(/\\/g, '/');
 
     let cachePathStats = gentleStat(cachePath);
