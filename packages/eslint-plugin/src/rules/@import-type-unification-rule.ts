@@ -3,9 +3,9 @@ import Path from 'path';
 
 import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/utils';
 import {
+  RuleFunction,
   RuleMetaData,
   RuleMetaDataDocs,
-  RuleFunction,
 } from '@typescript-eslint/utils/dist/ts-eslint/Rule';
 import {SourceCode} from 'eslint';
 import _ from 'lodash';
@@ -222,6 +222,7 @@ type MessageId = keyof typeof messages;
 
 const ruleBody = {
   name: 'import-type-unification-rule',
+  // eslint-disable-next-line @mufan/no-object-literal-type-assertion
   meta: {
     docs: {
       description: 'Unify the style of imports.',
@@ -235,7 +236,6 @@ const ruleBody = {
         properties: {
           cachePath: {
             type: 'string',
-            default: 'node_modules/@mufan/eslint-plugin/.cache/rules/import-type-unification',
           },
           quickConfigs: {
             type: 'array',
@@ -313,18 +313,23 @@ const ruleBody = {
 
 export const importTypeUnificationRule = createRule<Options, MessageId>({
   ...ruleBody,
-  defaultOptions: [{cachePath: 'node_modules/@mufan/eslint-plugin/.cache/rules/import-type-unification'}],
+  defaultOptions: [{}],
   create(context, [options]) {
-    let projectPath = process.cwd();
-    let filePath = Path.win32.relative(projectPath, context.getFilename());
+    let filePath = context.getFilename();
 
     let modulePathToReportInfoDict: Dict<ReportInfo> = {};
     let filePathToModulePaths: Dict<ModulePaths> = {};
 
-    let cachePath = Path.win32.resolve(
-      projectPath,
-      options.cachePath!,
-    ).replace(/\\/g, '/');
+    let cachePath: string;
+
+    if (!options.cachePath) {
+      cachePath = Path.win32.resolve(
+        Path.dirname(require.resolve('@mufan/eslint-plugin/package.json')),
+        '.cache/rules/import-type-unification',
+      ).replace(/\\/g, '/');
+    } else {
+      cachePath = Path.win32.resolve(process.cwd(), options.cachePath).replace(/\\/g, '/');
+    }
 
     let cachePathStats = gentleStat(cachePath);
 
@@ -674,7 +679,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               messageId: reportMessageId,
               data: {
                 identifier: identifier!.name,
-                filePath: filePath,
+                filePath,
                 line: identifier!.loc.start.line,
                 column: identifier!.loc.start.column,
                 moduleSpecifier,
@@ -690,7 +695,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               messageId: reportMessageId,
               data: {
                 identifier: info.identifier!.name,
-                filePath: filePath,
+                filePath,
                 line: info.identifier!.loc.start.line,
                 column: info.identifier!.loc.start.column,
                 moduleSpecifier,
@@ -719,18 +724,12 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         return;
       }
 
-      let moduleRelativePath = path;
-
-      if (Path.win32.basename(path) !== path) {
-        moduleRelativePath = Path.win32.relative(projectPath, path);
-      }
-
-      let reportInfo = modulePathToReportInfoDict[moduleRelativePath];
+      let reportInfo = modulePathToReportInfoDict[path];
 
       if (!reportInfo) {
-        reportInfo = modulePathToReportInfoDict[moduleRelativePath] = {
+        reportInfo = modulePathToReportInfoDict[path] = {
           importIdentifyInfos: [],
-          moduleSpecifier: moduleSpecifier,
+          moduleSpecifier,
         };
       }
 
@@ -748,11 +747,11 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
           filePathToModulePaths[
             filePath
           ].modulePaths = _.union(filePathToModulePaths[filePath].modulePaths, [
-            moduleRelativePath,
+            path!,
           ]);
         } else {
           filePathToModulePaths[filePath] = {
-            modulePaths: [moduleRelativePath],
+            modulePaths: [path!],
           };
         }
 
