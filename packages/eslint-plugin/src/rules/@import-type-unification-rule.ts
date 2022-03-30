@@ -1182,7 +1182,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     }
 
     function waitForReadingOrWriting(): void {
-      while (1) {
+      while (true) {
         try {
           FS.mkdirSync(atomicDirPath);
 
