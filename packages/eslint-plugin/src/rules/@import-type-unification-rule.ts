@@ -1,11 +1,11 @@
-import FS from 'fs';
-import Path from 'path';
+import * as FS from 'fs';
+import * as Path from 'path';
 
 import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/utils';
 import {
+  RuleFunction,
   RuleMetaData,
   RuleMetaDataDocs,
-  RuleFunction,
 } from '@typescript-eslint/utils/dist/ts-eslint/Rule';
 import {SourceCode} from 'eslint';
 import _ from 'lodash';
@@ -13,6 +13,8 @@ import {resolveWithCategory} from 'module-lens';
 import {Dict} from 'tslang';
 
 import {RequiredParserServices, createRule, gentleStat} from './@utils';
+
+const READ_WRITE_POLLING_INTERVAL = 50;
 
 type CreateRuleMeta<TMessageIds extends string> = {
   docs: Omit<RuleMetaDataDocs, 'url'>;
@@ -212,7 +214,7 @@ interface ConfigOption {
 
 type Options = [
   {
-    cachePath: string;
+    cachePath?: string;
     quickConfigs?: QuickConfigOptions[];
     configs?: ConfigOption[];
   },
@@ -222,6 +224,7 @@ type MessageId = keyof typeof messages;
 
 const ruleBody = {
   name: 'import-type-unification-rule',
+  // eslint-disable-next-line @mufan/no-object-literal-type-assertion
   meta: {
     docs: {
       description: 'Unify the style of imports.',
@@ -232,7 +235,6 @@ const ruleBody = {
     schema: [
       {
         type: 'object',
-        required: ['cachePath'],
         properties: {
           cachePath: {
             type: 'string',
@@ -313,18 +315,35 @@ const ruleBody = {
 
 export const importTypeUnificationRule = createRule<Options, MessageId>({
   ...ruleBody,
-  defaultOptions: [{cachePath: './.cache/rules/import-type-unification'}],
+  defaultOptions: [{}],
   create(context, [options]) {
-    let projectPath = process.cwd();
-    let filePath = Path.win32.relative(projectPath, context.getFilename());
+    let filePath = context.getFilename();
 
     let modulePathToReportInfoDict: Dict<ReportInfo> = {};
     let filePathToModulePaths: Dict<ModulePaths> = {};
 
-    let cachePath = Path.win32.resolve(
-      projectPath,
-      options.cachePath,
-    ).replace(/\\/g, '/');
+    let cachePath: string;
+
+    if (!options.cachePath) {
+      cachePath = Path.win32
+        .resolve(
+          Path.dirname(require.resolve('@mufan/eslint-plugin/package.json')),
+          '.cache/rules/import-type-unification',
+        )
+        .replace(/\\/g, '/');
+    } else {
+      cachePath = Path.win32
+        .resolve(process.cwd(), options.cachePath)
+        .replace(/\\/g, '/');
+    }
+
+    let atomicDirPath = Path.win32
+      .join(Path.win32.dirname(cachePath), 'atomic')
+      .replace(/\\/g, '/');
+
+    FS.mkdirSync(Path.dirname(cachePath), {recursive: true});
+
+    waitForReadingOrWriting();
 
     let cachePathStats = gentleStat(cachePath);
 
@@ -337,8 +356,6 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       filePathToModulePaths = cache.filePathToModulePaths;
     } else if (cachePathStats?.isDirectory()) {
       throw new Error('Intended cache path is occupied by a directory');
-    } else {
-      FS.mkdirSync(Path.dirname(cachePath), {recursive: true});
     }
 
     let newModulePaths = [];
@@ -450,6 +467,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     let encodeString = JSON.stringify(message);
 
     FS.writeFileSync(cachePath, encodeString);
+
+    deleteAtomicFile();
 
     return {};
 
@@ -674,7 +693,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               messageId: reportMessageId,
               data: {
                 identifier: identifier!.name,
-                filePath: filePath,
+                filePath,
                 line: identifier!.loc.start.line,
                 column: identifier!.loc.start.column,
                 moduleSpecifier,
@@ -690,7 +709,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               messageId: reportMessageId,
               data: {
                 identifier: info.identifier!.name,
-                filePath: filePath,
+                filePath,
                 line: info.identifier!.loc.start.line,
                 column: info.identifier!.loc.start.column,
                 moduleSpecifier,
@@ -719,18 +738,12 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         return;
       }
 
-      let moduleRelativePath = path;
-
-      if (Path.win32.basename(path) !== path) {
-        moduleRelativePath = Path.win32.relative(projectPath, path);
-      }
-
-      let reportInfo = modulePathToReportInfoDict[moduleRelativePath];
+      let reportInfo = modulePathToReportInfoDict[path];
 
       if (!reportInfo) {
-        reportInfo = modulePathToReportInfoDict[moduleRelativePath] = {
+        reportInfo = modulePathToReportInfoDict[path] = {
           importIdentifyInfos: [],
-          moduleSpecifier: moduleSpecifier,
+          moduleSpecifier,
         };
       }
 
@@ -745,14 +758,13 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         let info = new ImportIdentifyInfo();
 
         if (filePathToModulePaths[filePath]) {
-          filePathToModulePaths[
-            filePath
-          ].modulePaths = _.union(filePathToModulePaths[filePath].modulePaths, [
-            moduleRelativePath,
-          ]);
+          filePathToModulePaths[filePath].modulePaths = _.union(
+            filePathToModulePaths[filePath].modulePaths,
+            [path!],
+          );
         } else {
           filePathToModulePaths[filePath] = {
-            modulePaths: [moduleRelativePath],
+            modulePaths: [path!],
           };
         }
 
@@ -797,9 +809,10 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         return info;
       });
 
-      let notReportedImportIdentifyInfos = reportInfo.importIdentifyInfos.filter(
-        importIdentifyInfo => !importIdentifyInfo.reported,
-      );
+      let notReportedImportIdentifyInfos =
+        reportInfo.importIdentifyInfos.filter(
+          importIdentifyInfo => !importIdentifyInfo.reported,
+        );
       let notReportedGroups = _.groupBy(
         notReportedImportIdentifyInfos,
         'importType',
@@ -879,13 +892,13 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
                   anotherImportType === 'export-all'
                 ) {
                   context.report({
-                    node: (declaration as unknown) as TSESTree.Node,
+                    node: declaration as unknown as TSESTree.Node,
                     messageId: 'importTypeNotUnifiedForExportAll',
                     data: {
                       moduleSpecifier,
                       filePath: anotherImportIdentifyInfo.filePath,
-                      line:
-                        anotherImportIdentifyInfo.declaration.loc.start.line,
+                      line: anotherImportIdentifyInfo.declaration.loc.start
+                        .line,
                       column:
                         anotherImportIdentifyInfo.declaration.loc.start.column,
                     },
@@ -899,8 +912,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
                       filePath: anotherImportIdentifyInfo.filePath,
                       line: anotherImportIdentifyInfo.identifier!.loc.start
                         .line,
-                      column: anotherImportIdentifyInfo.identifier!.loc.start
-                        .column,
+                      column:
+                        anotherImportIdentifyInfo.identifier!.loc.start.column,
                     },
                   });
                 }
@@ -1119,7 +1132,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               });
             } else {
               context.report({
-                node: (declaration as unknown) as TSESTree.Node,
+                node: declaration as unknown as TSESTree.Node,
                 messageId: 'notMatchConfigurationForExportAll',
                 data: {moduleSpecifier},
               });
@@ -1166,6 +1179,31 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
           baseUrlDirName,
         });
       };
+    }
+
+    function waitForReadingOrWriting(): void {
+      while (true) {
+        try {
+          FS.mkdirSync(atomicDirPath);
+
+          break;
+        } catch (e) {
+          sleep(READ_WRITE_POLLING_INTERVAL);
+        }
+      }
+    }
+
+    function deleteAtomicFile(): void {
+      try {
+        FS.rmdirSync(atomicDirPath);
+      } catch (e) {
+        console.error(`${atomicDirPath} cannot be deleted.`);
+        console.error(e);
+      }
+    }
+
+    function sleep(interval: number): void {
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, interval);
     }
   },
 });

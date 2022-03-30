@@ -428,7 +428,7 @@ export const defaultConfig = {
       rules: {
         '@mufan/explicit-return-type': 'error',
         '@mufan/import-path-base-url': 'off',
-        "@mufan/import-type-unification": ["error", {"cachePath": "node_modules/@mufan/eslint-plugin/.cache/rules/import-type-unification"}],
+        "@mufan/import-type-unification": "error",
         '@mufan/strict-key-order': 'error',
         '@typescript-eslint/adjacent-overload-signatures': 'error',
         '@typescript-eslint/array-type': [
