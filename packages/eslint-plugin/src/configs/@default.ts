@@ -95,7 +95,7 @@ export const defaultConfig = {
     '@mufan/reference-missing-proof': [
       'error',
       {
-        extensions: ['.ts', '.tsx', '.d.ts', '.js', '.jsx', 'svg'],
+        extensions: ['.ts', '.tsx', '.d.ts', '.js', '.jsx', '.svg'],
         conditions: ['vite', 'import'],
         mainFields: ['main', 'module'],
       },
