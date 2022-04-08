@@ -1,0 +1,11 @@
+{
+  "name": "reference-missing-proof",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "workspaces": [
+    "packages/src1",
+    "packages/src2"
+  ]
+}

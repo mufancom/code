@@ -5,13 +5,6 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   rules: {
-    "@mufan/import-type-unification": ["error", {
-      quickConfigs: [
-        {
-          modules: ['typescript'],
-          allowDefaultAndNamedImport: true
-        }
-      ]
-    }]
+    "@mufan/import-type-unification": ["error"]
   }
 };

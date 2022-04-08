@@ -92,6 +92,14 @@ export const defaultConfig = {
         'module-source-path': 'full',
       },
     ],
+    '@mufan/reference-missing-proof': [
+      'error',
+      {
+        extensions: ['.ts', '.tsx', '.d.ts', '.js', '.jsx', 'svg'],
+        conditions: ['vite', 'import'],
+        mainFields: ['main', 'module'],
+      },
+    ],
     '@mufan/scoped-modules': 'error',
     '@typescript-eslint/explicit-member-accessibility': 'off',
     '@typescript-eslint/no-floating-promises': 'error',
@@ -428,7 +436,7 @@ export const defaultConfig = {
       rules: {
         '@mufan/explicit-return-type': 'error',
         '@mufan/import-path-base-url': 'off',
-        "@mufan/import-type-unification": "error",
+        '@mufan/import-type-unification': 'error',
         '@mufan/strict-key-order': 'error',
         '@typescript-eslint/adjacent-overload-signatures': 'error',
         '@typescript-eslint/array-type': [
