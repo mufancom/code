@@ -1,5 +1,5 @@
 import FS from 'fs';
-import Path from 'path';
+import * as Path from 'path';
 
 export function isSubPathOf(
   path: string,

@@ -1,5 +1,5 @@
 import FS from 'fs';
-import Path from 'path';
+import * as Path from 'path';
 
 import {AST_NODE_TYPES, TSESLint, TSESTree} from '@typescript-eslint/utils';
 import _ from 'lodash';
@@ -65,7 +65,8 @@ export const scopedModulesRule = createRule<Options, MessageId>({
 
   create(context) {
     const INDEX_FILE_REGEX = /(?:^|[\\/])index\.(?:js|jsx|ts|tsx|d\.ts)$/i;
-    const NAMESPACE_FILE_REGEX = /(?:^|[\\/])namespace\.(?:js|jsx|ts|tsx|d\.ts)$/i;
+    const NAMESPACE_FILE_REGEX =
+      /(?:^|[\\/])namespace\.(?:js|jsx|ts|tsx|d\.ts)$/i;
 
     const BANNED_IMPORT_REGEX = /^(?!(?:\.{1,2}[\\/])+@(?!.*[\\/]@)).*[\\/]@/;
     const BANNED_EXPORT_REGEX = /[\\/]@/;

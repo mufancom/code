@@ -1,5 +1,5 @@
-import FS from 'fs';
-import Path from 'path';
+import * as FS from 'fs';
+import * as Path from 'path';
 
 export const TEST_FILES_DIR = '../../../test';
 
