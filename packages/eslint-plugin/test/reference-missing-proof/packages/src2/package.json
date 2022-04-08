@@ -1,0 +1,12 @@
+{
+  "name": "reference-missing-proof-src2",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "exports": {
+    ".": {
+      "vite": "./main.ts",
+      "require": "./main.ts"
+    }
+  }
+}

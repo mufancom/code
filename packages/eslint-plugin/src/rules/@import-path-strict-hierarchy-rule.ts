@@ -1,4 +1,4 @@
-import Path from 'path';
+import * as Path from 'path';
 
 import {TSESTree} from '@typescript-eslint/utils';
 
@@ -106,9 +106,8 @@ export const importPathStrictHierarchyRule = createRule<Options, MessageId>({
         let helper = this.moduleSpecifierHelper;
 
         let specifier = getModuleSpecifier(context.getSourceCode(), expression);
-        let {path: specifierPath, category} = helper.resolveWithCategory(
-          specifier,
-        );
+        let {path: specifierPath, category} =
+          helper.resolveWithCategory(specifier);
 
         if (
           !specifierPath ||
@@ -132,11 +131,10 @@ export const importPathStrictHierarchyRule = createRule<Options, MessageId>({
         let relativeSpecifierPathFirstSegment = getFirstSegmentOfPath(
           specifierPathRelativeToProjectDir,
         );
-        let relativeSourceFileNameFirstSegment = sourceFileNameRelativeToProjectDir.includes(
-          Path.sep,
-        )
-          ? getFirstSegmentOfPath(sourceFileNameRelativeToProjectDir)
-          : removeModuleFileExtension(sourceFileNameRelativeToProjectDir);
+        let relativeSourceFileNameFirstSegment =
+          sourceFileNameRelativeToProjectDir.includes(Path.sep)
+            ? getFirstSegmentOfPath(sourceFileNameRelativeToProjectDir)
+            : removeModuleFileExtension(sourceFileNameRelativeToProjectDir);
 
         if (
           relativeSpecifierPathFirstSegment === '..' ||

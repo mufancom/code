@@ -1,0 +1,11 @@
+{
+  "name": "reference-missing-proof-src1",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "dependencies": {
+    "monaco-editor": "^0.33.0",
+    "react-easy-crop": "^4.1.4",
+    "reference-missing-proof-src2": "*"
+  }
+}

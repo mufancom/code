@@ -10,6 +10,7 @@ import {importTypeUnificationRule} from './@import-type-unification-rule';
 import {noEmptyConstructorRule} from './@no-empty-constructor-rule';
 import {noObjectLiteralTypeAssertionRule} from './@no-object-literal-type-assertion';
 import {orderedImportsRule} from './@ordered-imports';
+import {referenceMissingProofRule} from './@reference-missing-proof-rule';
 import {scopedModulesRule} from './@scoped-modules-rule';
 import {strictKeyOrderRule} from './@strict-key-order';
 
@@ -26,6 +27,7 @@ export const rules = {
   'no-empty-constructor': noEmptyConstructorRule,
   'no-object-literal-type-assertion': noObjectLiteralTypeAssertionRule,
   'ordered-imports': orderedImportsRule,
+  'reference-missing-proof': referenceMissingProofRule,
   'scoped-modules': scopedModulesRule,
   'strict-key-order': strictKeyOrderRule,
 };
