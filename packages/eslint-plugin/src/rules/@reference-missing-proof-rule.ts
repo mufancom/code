@@ -3,6 +3,7 @@ import * as Path from 'path';
 
 import {TSESTree} from '@typescript-eslint/utils';
 import {CachedInputFileSystem, ResolverFactory} from 'enhanced-resolve';
+import * as _ from 'lodash';
 import {isNodeBuiltIn} from 'module-lens';
 import * as Typescript from 'typescript';
 
@@ -10,7 +11,7 @@ import {createRule, getParserServices} from './@utils';
 
 const messages = {
   referenceMissing:
-    'The package "{{packageName}}" is missing in "references" of config "{{tsconfigPath}}".',
+    'The project "{{projectName}}" is missing in "references" of config "{{tsconfigPath}}".',
   cannotResolve: 'This module specifier cannot be resolved.',
 };
 
@@ -49,6 +50,27 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
 
   create(context, [options]) {
     let parserServices = getParserServices(context);
+
+    let projectReferences = parserServices.program.getProjectReferences();
+    let outDirs = _.compact(
+      projectReferences?.map(projectReference => {
+        let projectTSconfigPath = Typescript.findConfigFile(
+          projectReference.path,
+          Typescript.sys.fileExists,
+        );
+
+        if (!projectTSconfigPath) {
+          return undefined;
+        }
+
+        let outDir = JSON.parse(FS.readFileSync(projectTSconfigPath).toString())
+          ?.compilerOptions?.outDir;
+
+        return (
+          outDir && Path.resolve(Path.dirname(projectTSconfigPath), outDir)
+        );
+      }),
+    );
 
     let rmpResolver = ResolverFactory.createResolver({
       extensions: options?.extensions || [
@@ -103,51 +125,46 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
       }
 
       try {
-        let packagePath = rmpResolver.resolveSync(
+        let projectPath = rmpResolver.resolveSync(
           {},
           Path.dirname(context.getFilename()),
           moduleSpecifier,
         );
 
-        if (packagePath === false) {
+        if (projectPath === false) {
           throw new Error('Unexpected value of package path.');
         }
 
-        if (packagePath.includes('node_modules')) {
+        if (projectPath.includes('node_modules')) {
           return;
         }
 
-        let packageTSconfigPath = Typescript.findConfigFile(
-          Path.dirname(packagePath),
+        let tsconfigPath = Typescript.findConfigFile(
+          Path.dirname(context.getFilename()),
           Typescript.sys.fileExists,
         );
 
-        if (!packageTSconfigPath) {
+        if (!tsconfigPath) {
           return;
         }
 
-        if (
-          context.getFilename().startsWith(Path.dirname(packageTSconfigPath))
-        ) {
+        if (projectPath.startsWith(Path.dirname(tsconfigPath))) {
           return;
         }
 
-        let projectReferences = parserServices.program.getProjectReferences();
-
-        let isInReferences = projectReferences?.some(reference =>
-          (packagePath as string).startsWith(reference.path),
-        );
+        let isInReferences =
+          projectReferences?.some(reference =>
+            (projectPath as string).startsWith(reference.path),
+          ) ||
+          outDirs.some(outDir => (projectPath as string).startsWith(outDir));
 
         if (!isInReferences) {
           context.report({
             node: moduleSpecifierNode,
             messageId: 'referenceMissing',
             data: {
-              packageName: moduleSpecifier,
-              tsconfigPath: Typescript.findConfigFile(
-                Path.dirname(context.getFilename()),
-                Typescript.sys.fileExists,
-              ),
+              projectName: moduleSpecifier,
+              tsconfigPath,
             },
           });
         }
