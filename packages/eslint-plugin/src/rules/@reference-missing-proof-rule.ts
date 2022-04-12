@@ -154,7 +154,9 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
 
         let isInReferences =
           projectReferences?.some(reference =>
-            (projectPath as string).startsWith(reference.path),
+            (projectPath as string).startsWith(
+              FS.realpathSync.native(reference.path),
+            ),
           ) ||
           outDirs.some(outDir => (projectPath as string).startsWith(outDir));
 
