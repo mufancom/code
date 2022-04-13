@@ -55,7 +55,7 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
     let outDirs = _.compact(
       projectReferences?.map(projectReference => {
         let projectTSconfigPath = Typescript.findConfigFile(
-          projectReference.path,
+          FS.realpathSync.native(projectReference.path),
           Typescript.sys.fileExists,
         );
 
