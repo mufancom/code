@@ -13,3 +13,5 @@ import wahaha from 'http';
 import {Uri} from 'monaco-editor';
 
 import {Area} from 'react-easy-crop/types';
+
+import {VAR} from '../library';

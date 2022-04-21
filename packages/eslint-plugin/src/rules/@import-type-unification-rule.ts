@@ -14,6 +14,16 @@ import {Dict} from 'tslang';
 
 import {RequiredParserServices, createRule, gentleStat} from './@utils';
 
+let atomicDirPath: string;
+
+process.on('SIGINT', function () {
+  try {
+    FS.rmdirSync(atomicDirPath);
+  } catch (e) {}
+
+  process.exit();
+});
+
 const READ_WRITE_POLLING_INTERVAL = 50;
 
 type CreateRuleMeta<TMessageIds extends string> = {
@@ -337,7 +347,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         .replace(/\\/g, '/');
     }
 
-    let atomicDirPath = Path.win32
+    atomicDirPath = Path.win32
       .join(Path.win32.dirname(cachePath), 'atomic')
       .replace(/\\/g, '/');
 

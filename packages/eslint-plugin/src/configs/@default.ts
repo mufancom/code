@@ -96,7 +96,7 @@ export const defaultConfig = {
       'error',
       {
         extensions: ['.ts', '.tsx', '.d.ts', '.js', '.jsx', '.svg'],
-        conditions: ['vite', 'import'],
+        conditions: ['require', 'import'],
         mainFields: ['main', 'module'],
       },
     ],
