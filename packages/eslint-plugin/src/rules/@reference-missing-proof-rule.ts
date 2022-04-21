@@ -6,6 +6,7 @@ import {CachedInputFileSystem, ResolverFactory} from 'enhanced-resolve';
 import * as _ from 'lodash';
 import {isNodeBuiltIn} from 'module-lens';
 import * as Typescript from 'typescript';
+import * as JSON5 from 'json5';
 
 import {createRule, getParserServices} from './@utils';
 
@@ -63,8 +64,18 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
           return undefined;
         }
 
-        let outDir = JSON.parse(FS.readFileSync(projectTSconfigPath).toString())
-          ?.compilerOptions?.outDir;
+        let outDir: string | null;
+
+        try {
+          outDir = JSON5.parse(FS.readFileSync(projectTSconfigPath).toString())
+            ?.compilerOptions?.outDir;
+        } catch (e) {
+          console.error(
+            `JSON parse failed, tsconfig path: ${projectTSconfigPath}`,
+          );
+
+          return;
+        }
 
         return (
           outDir && Path.resolve(Path.dirname(projectTSconfigPath), outDir)
