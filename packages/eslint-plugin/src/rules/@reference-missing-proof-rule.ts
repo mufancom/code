@@ -3,6 +3,7 @@ import * as Path from 'path';
 
 import {TSESTree} from '@typescript-eslint/utils';
 import {CachedInputFileSystem, ResolverFactory} from 'enhanced-resolve';
+import * as JSON5 from 'json5';
 import * as _ from 'lodash';
 import {isNodeBuiltIn} from 'module-lens';
 import * as Typescript from 'typescript';
@@ -12,7 +13,7 @@ import {createRule, getParserServices} from './@utils';
 const messages = {
   referenceMissing:
     'The project "{{projectName}}" is missing in "references" of config "{{tsconfigPath}}".',
-  cannotResolve: 'This module specifier cannot be resolved.',
+  cannotResolve: 'The module specifier {{moduleSpecifier}} cannot be resolved.',
 };
 
 type Options = [
@@ -63,8 +64,18 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
           return undefined;
         }
 
-        let outDir = JSON.parse(FS.readFileSync(projectTSconfigPath).toString())
-          ?.compilerOptions?.outDir;
+        let outDir: string | null;
+
+        try {
+          outDir = JSON5.parse(FS.readFileSync(projectTSconfigPath).toString())
+            ?.compilerOptions?.outDir;
+        } catch (e) {
+          console.error(
+            `JSON parse failed, tsconfig path: ${projectTSconfigPath}`,
+          );
+
+          return;
+        }
 
         return (
           outDir && Path.resolve(Path.dirname(projectTSconfigPath), outDir)
@@ -148,17 +159,18 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
           return;
         }
 
-        if (projectPath.startsWith(Path.dirname(tsconfigPath))) {
+        if (pathStartsWith(projectPath, Path.dirname(tsconfigPath))) {
           return;
         }
 
         let isInReferences =
           projectReferences?.some(reference =>
-            (projectPath as string).startsWith(
+            pathStartsWith(
+              projectPath as string,
               FS.realpathSync.native(reference.path),
             ),
           ) ||
-          outDirs.some(outDir => (projectPath as string).startsWith(outDir));
+          outDirs.some(outDir => pathStartsWith(projectPath as string, outDir));
 
         if (!isInReferences) {
           context.report({
@@ -174,8 +186,15 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
         context.report({
           node: moduleSpecifierNode,
           messageId: 'cannotResolve',
+          data: {
+            moduleSpecifier,
+          },
         });
       }
     }
   },
 });
+
+function pathStartsWith(path: string, dirPath: string): boolean {
+  return !Path.relative(dirPath, path).startsWith('..');
+}
