@@ -722,6 +722,16 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       return true;
     }
 
+    function deleteImportIdentityInfo(path: string): void {
+      for (let modulePath of filePathToModulePaths[path]?.modulePaths || []) {
+        let reportInfo = modulePathToReportInfoDict[modulePath];
+
+        if (reportInfo?.importIdentifyInfos) {
+          _.remove(reportInfo.importIdentifyInfos, {filePath: path});
+        }
+      }
+    }
+
     function handleNameIdenticalImport(
       importTypeToImportIdentifyInfosDict: Dict<ImportIdentifyInfo[]>,
       notReportedImportTypeToImportIdentifyInfosDict: _.Dictionary<
@@ -738,10 +748,24 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         return false;
       }
 
-      let importIdentifyInfo = importIdentifyInfos.find(
-        importIdentifyInfo =>
-          importIdentifyInfo.identifier!.name !== identifier.name,
-      )!;
+      let importIdentifyInfo = importIdentifyInfos.find(importIdentifyInfo => {
+        if (importIdentifyInfo.identifier!.name !== identifier.name) {
+          let stat = gentleStat(importIdentifyInfo.filePath);
+
+          if (!stat) {
+            deleteImportIdentityInfo(importIdentifyInfo.filePath);
+          }
+
+          return stat ? true : false;
+        }
+
+        return false;
+      })!;
+
+      if (!importIdentifyInfo) {
+        return false;
+      }
+
       let anotherIdentifier = importIdentifyInfo.identifier!;
 
       context.report({
@@ -1002,7 +1026,21 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
                   anotherImportType.startsWith('type')
               ) {
                 let anotherImportIdentifyInfo =
-                  importTypeToImportIdentifyInfosDict[anotherImportType][0];
+                  importTypeToImportIdentifyInfosDict[anotherImportType].find(
+                    importIdentityInfo => {
+                      if (gentleStat(importIdentityInfo.filePath)) {
+                        return true;
+                      }
+
+                      deleteImportIdentityInfo(importIdentityInfo.filePath);
+
+                      return false;
+                    },
+                  );
+
+                if (!anotherImportIdentifyInfo) {
+                  continue;
+                }
 
                 if (
                   importType === 'export-all' ||
@@ -1064,6 +1102,12 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
                     ) {
                       continue;
                     }
+                  }
+
+                  if (!gentleStat(anotherInfo.filePath)) {
+                    deleteImportIdentityInfo(anotherInfo.filePath);
+
+                    continue;
                   }
 
                   let reportInfo =
