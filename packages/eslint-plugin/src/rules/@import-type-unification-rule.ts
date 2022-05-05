@@ -817,7 +817,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               messageId: reportMessageId,
               data: {
                 identifier: info.identifier!.name,
-                filePath,
+                filePath: info.filePath,
                 line: info.identifier!.loc.start.line,
                 column: info.identifier!.loc.start.column,
                 moduleSpecifier,
