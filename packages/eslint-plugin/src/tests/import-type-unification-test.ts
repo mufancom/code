@@ -1,6 +1,6 @@
 import * as Path from 'path';
 
-import {RuleTesterConfig} from '@typescript-eslint/utils/dist/ts-eslint';
+import type {RuleTesterConfig} from '@typescript-eslint/utils/dist/ts-eslint';
 
 import {rules} from '../rules';
 
@@ -42,8 +42,8 @@ ruleTester1.run('import-type-unification', rules['import-type-unification'], {
       filename: getTestFilePath('test1.ts'),
       options: [{cachePath: getCachePath(getTestFilePath('test1.ts'))}],
       errors: [
-        {messageId: 'importTypeNotUnified', line: 1},
         {messageId: 'importTypeNotUnified', line: 2},
+        {messageId: 'importTypeNotUnified', line: 3},
       ],
     },
     {
@@ -53,6 +53,10 @@ ruleTester1.run('import-type-unification', rules['import-type-unification'], {
       errors: [
         {messageId: 'importTypeNotUnified', line: 5},
         {messageId: 'importTypeNotUnified', line: 6},
+        {messageId: 'importTypeNotUnified', line: 7},
+        {messageId: 'importTypeNotUnified', line: 8},
+        {messageId: 'importTypeNotUnified', line: 13},
+        {messageId: 'importTypeNotUnified', line: 15},
       ],
     },
     {

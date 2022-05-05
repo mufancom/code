@@ -1,3 +1,4 @@
+import type a from 'lodash';
 import _ from 'lodash';
 import a from 'lodash';
 

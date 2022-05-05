@@ -2,7 +2,10 @@
 # 判断是否报错的逻辑
 
 1. 没有配置
-  (1)
+  (1) 是'export-namespace'或'type-export-namespace'，那么直接判断有没有identifier不一样
+  (2) 不是'export-namespace'或'type-export-namespace'，并且只有一种import(import有'default'、'namespace'、'equals'以及有'type-'前缀的import)，那么直接判断有没有identifier不一样。
+      注意：这里没有'type-'前缀的import和有'type-'前缀的import是分开判断的，即同一时间只看没有'type-'前缀的import或只看有'type-'前缀的import。
+  (3) 不是'export-namespace'或'type-export-namespace'，并且有多种import，那么都报错。
 
 2. 有配置
   (1) 有quickConfig
@@ -700,8 +703,19 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       };
     }
 
-    function checkDefaultUnity(importTypes: string[]): boolean {
-      if (importTypes.length > 1) {
+    function checkDefaultUnity(
+      importTypes: string[],
+      importType: ImportType,
+    ): boolean {
+      let isTypeImport = importType.startsWith('type');
+
+      if (
+        importTypes.filter(importType =>
+          isTypeImport
+            ? importType.startsWith('type')
+            : !importType.startsWith('type'),
+        ).length > 1
+      ) {
         return false;
       }
 
@@ -962,7 +976,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
             ) {
               info.reported = true;
             }
-          } else if (checkDefaultUnity(importTypes)) {
+          } else if (checkDefaultUnity(importTypes, importType)) {
             if (
               importType !== 'export-all' &&
               handleNameIdenticalImport(
@@ -982,7 +996,11 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
             let reportedImportInfo: ImportIdentifyInfo | undefined;
 
             for (let anotherImportType of importTypes) {
-              if (anotherImportType !== importType) {
+              if (
+                anotherImportType !== importType &&
+                importType.startsWith('type') ===
+                  anotherImportType.startsWith('type')
+              ) {
                 let anotherImportIdentifyInfo =
                   importTypeToImportIdentifyInfosDict[anotherImportType][0];
 
@@ -1023,7 +1041,11 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               }
             }
 
-            for (let anotherImportType of importTypes) {
+            for (let anotherImportType of importTypes.filter(
+              anotherImportType =>
+                importType.startsWith('type') ===
+                anotherImportType.startsWith('type'),
+            )) {
               let notReportedImportTypeToImportIdentifyInfos =
                 notReportedGroups[anotherImportType];
 
