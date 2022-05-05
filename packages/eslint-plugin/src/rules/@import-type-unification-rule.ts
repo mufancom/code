@@ -806,6 +806,12 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               continue;
             }
 
+            if (!gentleStat(info.filePath)) {
+              deleteImportIdentityInfo(info.filePath);
+
+              continue;
+            }
+
             context.report({
               node: identifier,
               messageId: reportMessageId,
