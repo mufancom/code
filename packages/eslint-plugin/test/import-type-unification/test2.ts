@@ -6,3 +6,4 @@ import Path1 from 'path';
 import Path2 from 'path';
 
 import * as ChildProcess from 'child_process';
+export * as ChildProcess from 'child_process';
