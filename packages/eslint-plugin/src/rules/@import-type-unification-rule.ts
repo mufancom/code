@@ -1,18 +1,20 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
-import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/utils';
-import {
+import type {TSESTree} from '@typescript-eslint/utils';
+import {AST_NODE_TYPES} from '@typescript-eslint/utils';
+import type {
   RuleFunction,
   RuleMetaData,
   RuleMetaDataDocs,
 } from '@typescript-eslint/utils/dist/ts-eslint/Rule';
-import {SourceCode} from 'eslint';
+import type {SourceCode} from 'eslint';
 import _ from 'lodash';
 import {resolveWithCategory} from 'module-lens';
-import {Dict} from 'tslang';
+import type {Dict} from 'tslang';
 
-import {RequiredParserServices, createRule, gentleStat} from './@utils';
+import type {RequiredParserServices} from './@utils';
+import {createRule, gentleStat} from './@utils';
 
 let atomicDirPath: string;
 

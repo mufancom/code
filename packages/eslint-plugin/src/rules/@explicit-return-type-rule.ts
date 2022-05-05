@@ -1,6 +1,6 @@
-import {ParserServices, TSESLint} from '@typescript-eslint/utils';
+import type {ParserServices, TSESLint} from '@typescript-eslint/utils';
 import {getChildOfKind, isAssignmentKind} from 'tsutils';
-import {
+import type {
   ArrowFunction,
   FunctionDeclaration,
   FunctionExpression,
@@ -9,9 +9,11 @@ import {
   MethodDeclaration,
   Node,
   SourceFile,
-  SyntaxKind,
   Type,
   TypeChecker,
+} from 'typescript';
+import {
+  SyntaxKind,
   forEachChild,
   isArrowFunction,
   isBinaryExpression,
@@ -299,7 +301,7 @@ export const explicitReturnTypeRule = createRule<Options, MessageId>({
 
     function getParserServices<
       TMessageIds extends string,
-      TOptions extends unknown[]
+      TOptions extends unknown[],
     >(
       context: TSESLint.RuleContext<TMessageIds, TOptions>,
     ): RequiredParserServices {

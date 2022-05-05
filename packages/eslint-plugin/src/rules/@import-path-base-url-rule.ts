@@ -1,4 +1,4 @@
-import {TSESTree} from '@typescript-eslint/utils';
+import type {TSESTree} from '@typescript-eslint/utils';
 
 import {
   ImportKind,
@@ -87,17 +87,14 @@ export const importPathBaseUrlRule = createRule<Options, MessageId>({
 
       let relative = isRelativeModuleSpecifier(specifier);
 
-      let relativeSourcePath = helper.getRelativePathToBaseUrlDir(
-        sourceFileName,
-      );
+      let relativeSourcePath =
+        helper.getRelativePathToBaseUrlDir(sourceFileName);
 
-      let firstSegmentOfRelativeSourcePath = getFirstSegmentOfPath(
-        relativeSourcePath,
-      );
+      let firstSegmentOfRelativeSourcePath =
+        getFirstSegmentOfPath(relativeSourcePath);
 
-      let relativeSpecifierPath = helper.getRelativePathToBaseUrlDir(
-        fullSpecifierPath,
-      );
+      let relativeSpecifierPath =
+        helper.getRelativePathToBaseUrlDir(fullSpecifierPath);
 
       let firstSegmentOfSpecifierPath = getFirstSegmentOfPath(
         relativeSpecifierPath,

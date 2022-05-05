@@ -1,6 +1,6 @@
-import {TSESLint} from '@typescript-eslint/utils';
+import type {TSESLint} from '@typescript-eslint/utils';
 import {getNextStatement, isBlockLike} from 'tsutils';
-import {
+import type {
   Block,
   ClassDeclaration,
   ConstructorDeclaration,
@@ -23,6 +23,8 @@ import {
   SyntaxList,
   TryStatement,
   WhileStatement,
+} from 'typescript';
+import {
   forEachChild,
   isArrowFunction,
   isBlock,
@@ -390,7 +392,7 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
     }
 
     function getFirstSignature<
-      T extends FunctionDeclaration | MethodDeclaration
+      T extends FunctionDeclaration | MethodDeclaration,
     >(node: T): T | undefined {
       let parentSyntaxList = getParentSyntaxList(node);
 

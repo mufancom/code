@@ -1,6 +1,6 @@
 import * as Path from 'path';
 
-import {TSESTree} from '@typescript-eslint/utils';
+import type {TSESTree} from '@typescript-eslint/utils';
 import {format} from 'module-lens';
 
 import {

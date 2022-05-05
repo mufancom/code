@@ -1,7 +1,8 @@
-import FS from 'fs';
+import * as FS from 'fs';
 import * as Path from 'path';
 
-import {AST_NODE_TYPES, TSESLint, TSESTree} from '@typescript-eslint/utils';
+import type {TSESLint, TSESTree} from '@typescript-eslint/utils';
+import {AST_NODE_TYPES} from '@typescript-eslint/utils';
 import _ from 'lodash';
 
 import {
@@ -402,6 +403,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
         continue;
       }
 
+      // eslint-disable-next-line @mufan/no-object-literal-type-assertion
       infos.push({
         type,
         statement,

@@ -1,7 +1,8 @@
-import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/utils';
+import type {TSESTree} from '@typescript-eslint/utils';
+import {AST_NODE_TYPES} from '@typescript-eslint/utils';
 import * as jsdiff from 'diff';
 import _ from 'lodash';
-import TypeScript from 'typescript';
+import type TypeScript from 'typescript';
 
 import {createRule, getParserServices} from './@utils';
 
@@ -83,8 +84,8 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
         typeAnnotation.typeAnnotation,
       );
 
-      let typeNodeMembers = typeChecker.getTypeAtLocation(typeNode).symbol
-        .members;
+      let typeNodeMembers =
+        typeChecker.getTypeAtLocation(typeNode).symbol.members;
 
       let typeKeys = typeNodeMembers
         ? mapIteratorToArray(typeNodeMembers.keys())

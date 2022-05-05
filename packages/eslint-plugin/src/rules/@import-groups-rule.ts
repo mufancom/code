@@ -1,10 +1,11 @@
-import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/utils';
+import type {TSESTree} from '@typescript-eslint/utils';
+import {AST_NODE_TYPES} from '@typescript-eslint/utils';
 import {isNodeBuiltIn, resolveWithCategory} from 'module-lens';
-import {Dict} from 'tslang';
+import type {Dict} from 'tslang';
 
+import type {ModuleSpecifierHelperOptions} from './@utils';
 import {
   ModuleSpecifierHelper,
-  ModuleSpecifierHelperOptions,
   createRule,
   getFullStart,
   getModuleSpecifier,

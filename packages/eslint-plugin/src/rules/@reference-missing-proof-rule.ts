@@ -1,12 +1,12 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
-import {TSESTree} from '@typescript-eslint/utils';
+import type {TSESTree} from '@typescript-eslint/utils';
 import {CachedInputFileSystem, ResolverFactory} from 'enhanced-resolve';
 import * as JSON5 from 'json5';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import {isNodeBuiltIn} from 'module-lens';
-import * as Typescript from 'typescript';
+import Typescript from 'typescript';
 
 import {createRule, getParserServices} from './@utils';
 
