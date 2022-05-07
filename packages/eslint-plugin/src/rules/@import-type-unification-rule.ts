@@ -1,18 +1,36 @@
+/*
+# 判断是否报错的逻辑
+
+1. 没有配置
+  (1) 是'export-namespace'或'type-export-namespace'，那么直接判断有没有identifier不一样
+  (2) 不是'export-namespace'或'type-export-namespace'，并且只有一种import(import有'default'、'namespace'、'equals'以及有'type-'前缀的import)，那么直接判断有没有identifier不一样。
+      注意：这里没有'type-'前缀的import和有'type-'前缀的import是分开判断的，即同一时间只看没有'type-'前缀的import或只看有'type-'前缀的import。
+  (3) 不是'export-namespace'或'type-export-namespace'，并且有多种import，那么都报错。
+
+2. 有配置
+  (1) 有quickConfig
+
+  (2) 没有quickConfig，有config
+
+*/
+
 import * as FS from 'fs';
 import * as Path from 'path';
 
-import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/utils';
-import {
+import type {TSESTree} from '@typescript-eslint/utils';
+import {AST_NODE_TYPES} from '@typescript-eslint/utils';
+import type {
   RuleFunction,
   RuleMetaData,
   RuleMetaDataDocs,
 } from '@typescript-eslint/utils/dist/ts-eslint/Rule';
-import {SourceCode} from 'eslint';
+import type {SourceCode} from 'eslint';
 import _ from 'lodash';
 import {resolveWithCategory} from 'module-lens';
-import {Dict} from 'tslang';
+import type {Dict} from 'tslang';
 
-import {RequiredParserServices, createRule, gentleStat} from './@utils';
+import type {RequiredParserServices} from './@utils';
+import {createRule, gentleStat} from './@utils';
 
 let atomicDirPath: string;
 
@@ -36,14 +54,7 @@ type ConcernedDeclaration =
   | TSESTree.ExportAllDeclaration
   | TSESTree.ExportNamedDeclaration;
 
-type ImportType =
-  | 'default'
-  | 'namespace'
-  | 'named'
-  | 'equals'
-  | 'export-all'
-  | 'export-named'
-  | 'export-namespace';
+type ImportType = ImportInfo['importType'];
 
 const IMPORT_TYPES = [
   'default',
@@ -51,9 +62,13 @@ const IMPORT_TYPES = [
   'named',
   'named-as',
   'equals',
+  'type-default',
+  'type-namespace',
+  'type-named',
+  'type-export-named',
+  'type-export-namespace',
   'export-all',
   'export-named',
-  'export-named-as',
   'export-namespace',
 ];
 
@@ -98,6 +113,33 @@ interface ExportNamespaceImportInfo {
   localIdentifier: TSESTree.Identifier;
 }
 
+interface DefaultTypeImportInfo {
+  importType: 'type-default';
+  localIdentifier: TSESTree.Identifier;
+}
+
+interface NamespaceTypeImportInfo {
+  importType: 'type-namespace';
+  localIdentifier: TSESTree.Identifier;
+}
+
+interface NamedTypeImportInfo {
+  importType: 'type-named';
+  localIdentifier: TSESTree.Identifier;
+  importedIdentifier: TSESTree.Identifier;
+}
+
+interface ExportNamedTypeImportInfo {
+  importType: 'type-export-named';
+  localIdentifier: TSESTree.Identifier;
+  importedIdentifier: TSESTree.Identifier;
+}
+
+interface ExportNamespaceTypeImportInfo {
+  importType: 'type-export-namespace';
+  localIdentifier: TSESTree.Identifier;
+}
+
 type ImportInfo = (
   | DefaultImportInfo
   | NamespaceImportInfo
@@ -106,6 +148,11 @@ type ImportInfo = (
   | ExportAllImportInfo
   | ExportNamedImportInfo
   | ExportNamespaceImportInfo
+  | DefaultTypeImportInfo
+  | NamespaceTypeImportInfo
+  | ExportNamedTypeImportInfo
+  | NamedTypeImportInfo
+  | ExportNamespaceTypeImportInfo
 ) & {
   declaration: ConcernedDeclaration;
 };
@@ -536,6 +583,11 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         (declaration.type === 'ExportNamedDeclaration' &&
           !!(declaration.source as TSESTree.Literal)?.value)
       ) {
+        let isTypeImport =
+          declaration.type === 'ImportDeclaration'
+            ? declaration.importKind === 'type'
+            : declaration.exportKind === 'type';
+
         return _.compact(
           declaration.specifiers.map(specifier => {
             let localIdentifier = specifier.local;
@@ -543,7 +595,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
             switch (specifier.type) {
               case 'ImportDefaultSpecifier':
                 return {
-                  importType: 'default',
+                  importType: isTypeImport ? 'type-default' : 'default',
                   localIdentifier,
                   importedIdentifier: undefined,
                   declaration,
@@ -551,7 +603,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
               case 'ImportNamespaceSpecifier':
                 return {
-                  importType: 'namespace',
+                  importType: isTypeImport ? 'type-namespace' : 'namespace',
                   localIdentifier,
                   importedIdentifier: undefined,
                   declaration,
@@ -559,7 +611,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
               case 'ImportSpecifier':
                 return {
-                  importType: 'named',
+                  importType: isTypeImport ? 'type-named' : 'named',
                   localIdentifier,
                   importedIdentifier: specifier.imported,
                   declaration,
@@ -567,7 +619,9 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
               case 'ExportSpecifier':
                 return {
-                  importType: 'export-named',
+                  importType: isTypeImport
+                    ? 'type-export-named'
+                    : 'export-named',
                   localIdentifier,
                   importedIdentifier: specifier.exported,
                   declaration,
@@ -590,7 +644,10 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         if (declaration.exported) {
           return [
             {
-              importType: 'export-namespace',
+              importType:
+                declaration.exportKind === 'type'
+                  ? 'type-export-namespace'
+                  : 'export-namespace',
               localIdentifier: declaration.exported,
               declaration,
             },
@@ -646,12 +703,33 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       };
     }
 
-    function checkDefaultUnity(importTypes: string[]): boolean {
-      if (importTypes.length > 1) {
+    function checkDefaultUnity(
+      importTypes: string[],
+      importType: ImportType,
+    ): boolean {
+      let isTypeImport = importType.startsWith('type');
+
+      if (
+        importTypes.filter(importType =>
+          isTypeImport
+            ? importType.startsWith('type')
+            : !importType.startsWith('type'),
+        ).length > 1
+      ) {
         return false;
       }
 
       return true;
+    }
+
+    function deleteImportIdentityInfo(path: string): void {
+      for (let modulePath of filePathToModulePaths[path]?.modulePaths || []) {
+        let reportInfo = modulePathToReportInfoDict[modulePath];
+
+        if (reportInfo?.importIdentifyInfos) {
+          _.remove(reportInfo.importIdentifyInfos, {filePath: path});
+        }
+      }
     }
 
     function handleNameIdenticalImport(
@@ -670,10 +748,24 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         return false;
       }
 
-      let importIdentifyInfo = importIdentifyInfos.find(
-        importIdentifyInfo =>
-          importIdentifyInfo.identifier!.name !== identifier.name,
-      )!;
+      let importIdentifyInfo = importIdentifyInfos.find(importIdentifyInfo => {
+        if (importIdentifyInfo.identifier!.name !== identifier.name) {
+          let stat = gentleStat(importIdentifyInfo.filePath);
+
+          if (!stat) {
+            deleteImportIdentityInfo(importIdentifyInfo.filePath);
+          }
+
+          return stat ? true : false;
+        }
+
+        return false;
+      })!;
+
+      if (!importIdentifyInfo) {
+        return false;
+      }
+
       let anotherIdentifier = importIdentifyInfo.identifier!;
 
       context.report({
@@ -714,12 +806,18 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               continue;
             }
 
+            if (!gentleStat(info.filePath)) {
+              deleteImportIdentityInfo(info.filePath);
+
+              continue;
+            }
+
             context.report({
               node: identifier,
               messageId: reportMessageId,
               data: {
                 identifier: info.identifier!.name,
-                filePath,
+                filePath: info.filePath,
                 line: info.identifier!.loc.start.line,
                 column: info.identifier!.loc.start.column,
                 moduleSpecifier,
@@ -793,14 +891,19 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
           case 'default':
           case 'namespace':
           case 'equals':
-          case 'export-namespace': {
+          case 'export-namespace':
+          case 'type-default':
+          case 'type-namespace':
+          case 'type-export-namespace': {
             info.identifier = newIdentifier(importInfo.localIdentifier);
 
             break;
           }
 
           case 'named':
-          case 'export-named': {
+          case 'export-named':
+          case 'type-named':
+          case 'type-export-named': {
             info.identifier = newIdentifier(importInfo.localIdentifier);
             info.importedIdentifier = newIdentifier(
               importInfo.importedIdentifier,
@@ -831,14 +934,23 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       reportInfo.importIdentifyInfos = reportInfo.importIdentifyInfos.concat(
         newImportIdentifyInfos.filter(
           info =>
-            info.importType !== 'named' && info.importType !== 'export-named', // not save info of 'name' and 'export-named' imports
+            info.importType !== 'named' &&
+            info.importType !== 'export-named' &&
+            info.importType !== 'type-named' &&
+            info.importType !== 'type-export-named', // not save info of 'name' and 'export-named' imports
         ),
       );
 
       let groups = _.groupBy(reportInfo.importIdentifyInfos, 'importType');
       let importTypeToImportIdentifyInfosDict: Dict<ImportIdentifyInfo[]> = {};
       let importTypes = Object.keys(groups).filter(
-        importType => importType !== 'named' && importType !== 'export-named',
+        importType =>
+          importType !== 'named' &&
+          importType !== 'export-named' &&
+          importType !== 'type-named' &&
+          importType !== 'type-export-named' &&
+          importType !== 'export-namespace' &&
+          importType !== 'type-export-namespace',
       );
 
       for (let importType of Object.keys(groups)) {
@@ -868,12 +980,33 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         }
 
         if (!isConfiguredModule) {
-          // TODO (ooyyloo): add configuration regulation about these two import types
-          if (importType === 'named' || importType === 'export-named') {
+          // TODO (ooyyloo): add configuration regulation about the following import types
+          if (
+            importType === 'named' ||
+            importType === 'export-named' ||
+            importType === 'type-named' ||
+            importType === 'type-export-named'
+          ) {
             continue;
           }
 
-          if (checkDefaultUnity(importTypes)) {
+          if (
+            importType === 'export-namespace' ||
+            importType === 'type-export-namespace'
+          ) {
+            if (
+              handleNameIdenticalImport(
+                importTypeToImportIdentifyInfosDict,
+                notReportedGroups,
+                importType,
+                localIdentifier!,
+                'importTypeNotUnified',
+                moduleSpecifier,
+              )
+            ) {
+              info.reported = true;
+            }
+          } else if (checkDefaultUnity(importTypes, importType)) {
             if (
               importType !== 'export-all' &&
               handleNameIdenticalImport(
@@ -893,9 +1026,27 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
             let reportedImportInfo: ImportIdentifyInfo | undefined;
 
             for (let anotherImportType of importTypes) {
-              if (anotherImportType !== importType) {
+              if (
+                anotherImportType !== importType &&
+                importType.startsWith('type') ===
+                  anotherImportType.startsWith('type')
+              ) {
                 let anotherImportIdentifyInfo =
-                  importTypeToImportIdentifyInfosDict[anotherImportType][0];
+                  importTypeToImportIdentifyInfosDict[anotherImportType].find(
+                    importIdentityInfo => {
+                      if (gentleStat(importIdentityInfo.filePath)) {
+                        return true;
+                      }
+
+                      deleteImportIdentityInfo(importIdentityInfo.filePath);
+
+                      return false;
+                    },
+                  );
+
+                if (!anotherImportIdentifyInfo) {
+                  continue;
+                }
 
                 if (
                   importType === 'export-all' ||
@@ -934,7 +1085,11 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               }
             }
 
-            for (let anotherImportType of importTypes) {
+            for (let anotherImportType of importTypes.filter(
+              anotherImportType =>
+                importType.startsWith('type') ===
+                anotherImportType.startsWith('type'),
+            )) {
               let notReportedImportTypeToImportIdentifyInfos =
                 notReportedGroups[anotherImportType];
 
@@ -953,6 +1108,12 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
                     ) {
                       continue;
                     }
+                  }
+
+                  if (!gentleStat(anotherInfo.filePath)) {
+                    deleteImportIdentityInfo(anotherInfo.filePath);
+
+                    continue;
                   }
 
                   let reportInfo =
@@ -999,7 +1160,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
             let {defaultImportNamingType, namedImportNamingType} = quickConfig;
 
             switch (importType) {
-              case 'default': {
+              case 'default':
+              case 'type-default': {
                 let importNamingType = defaultImportNamingType ?? 'as-is';
 
                 if (
@@ -1025,7 +1187,9 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               }
 
               case 'named':
-              case 'export-named': {
+              case 'export-named':
+              case 'type-named':
+              case 'type-export-named': {
                 let importNamingType = namedImportNamingType ?? 'as-is';
 
                 if (
@@ -1053,8 +1217,13 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
             }
           }
 
-          // TODO (ooyyloo): add configuration regulation about these two import types
-          if (importType === 'named' || importType === 'export-named') {
+          // TODO (ooyyloo): add configuration regulation about the following import types
+          if (
+            importType === 'named' ||
+            importType === 'export-named' ||
+            importType === 'type-named' ||
+            importType === 'type-export-named'
+          ) {
             continue;
           }
 

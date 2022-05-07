@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import {TSESLint, TSESTree} from '@typescript-eslint/utils';
+import type {TSESLint, TSESTree} from '@typescript-eslint/utils';
 import {
   isExternalModuleReference,
   isImportDeclaration,
@@ -554,9 +554,8 @@ export const orderedImportsRule = createRule<Options, MessageId>({
           .map(block => block.getImportDeclarations())
           .filter(imports => imports.length > 0);
 
-        const replacements = this.getGroupRemovalReplacements(
-          groupedDeclarations,
-        );
+        const replacements =
+          this.getGroupRemovalReplacements(groupedDeclarations);
 
         const allImportDeclarations = ([] as ImportDeclaration[]).concat(
           ...groupedDeclarations,
