@@ -12,6 +12,7 @@
     "strict": true,
     "strictFunctionTypes": false,
     "noImplicitReturns": true,
+    "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "useDefineForClassFields": true,
 
