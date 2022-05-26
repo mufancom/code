@@ -146,7 +146,10 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
           throw new Error('Unexpected value of package path.');
         }
 
-        if (projectPath.includes('node_modules')) {
+        if (
+          projectPath.includes('node_modules') ||
+          !pathStartsWith(projectPath, process.cwd())
+        ) {
           return;
         }
 
