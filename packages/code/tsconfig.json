@@ -16,6 +16,7 @@
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "useDefineForClassFields": true,
+    "skipLibCheck": true,
 
     "newLine": "LF"
   }
