@@ -364,7 +364,13 @@ export const defaultConfig = {
     'padded-blocks': 'off',
     'padding-line-between-statements': 'off',
     'prefer-arrow-callback': 'off',
-    'prefer-const': 'off',
+    'prefer-const': [
+      'error',
+      {
+        destructuring: 'all',
+        ignoreReadBeforeAssign: true,
+      },
+    ],
     'prefer-destructuring': 'off',
     'prefer-named-capture-group': 'off',
     'prefer-numeric-literals': 'off',
