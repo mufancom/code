@@ -37,11 +37,11 @@ export const importPathBeSmartRule = createRule<Options, MessageId>({
   create(context) {
     class ImportPathBeSmartWalker {
       walk(): void {
-        let sourceDirName = Path.dirname(context.getFilename());
+        const sourceDirName = Path.dirname(context.getFilename());
 
-        let imports = findImports(context, ImportKind.AllImports);
+        const imports = findImports(context, ImportKind.AllImports);
 
-        for (let expression of imports) {
+        for (const expression of imports) {
           this.validateModuleSpecifier(expression, sourceDirName);
         }
       }
@@ -50,9 +50,9 @@ export const importPathBeSmartRule = createRule<Options, MessageId>({
         expression: TSESTree.LiteralExpression,
         sourceDirName: string,
       ): void {
-        let specifier = getModuleSpecifier(context.getSourceCode(), expression);
+        const specifier = getModuleSpecifier(context.getSourceCode(), expression);
 
-        let dotSlash = specifier.startsWith('./');
+        const dotSlash = specifier.startsWith('./');
 
         // foo/bar/../abc -> foo/abc
         let normalizedSpecifier = format(
@@ -60,7 +60,7 @@ export const importPathBeSmartRule = createRule<Options, MessageId>({
           dotSlash,
         );
 
-        let [refSpecifier, firstNonUpperSegment] = /^(?:\.\.\/)+([^/]+)/.exec(
+        const [refSpecifier, firstNonUpperSegment] = /^(?:\.\.\/)+([^/]+)/.exec(
           specifier,
         ) || [undefined, undefined];
 
@@ -71,14 +71,14 @@ export const importPathBeSmartRule = createRule<Options, MessageId>({
               .replace(/^@types\//, '');
           }
 
-          let refPath = Path.join(sourceDirName, refSpecifier);
+          const refPath = Path.join(sourceDirName, refSpecifier);
 
           // importing '../foo/bar' ('abc/foo/bar') within source file
           // 'abc/foo/test.ts', which could simply be importing './bar'.
 
           if (isSubPathOf(sourceDirName, refPath, true)) {
-            let path = Path.join(sourceDirName, specifier);
-            let relativePath = Path.relative(sourceDirName, path);
+            const path = Path.join(sourceDirName, specifier);
+            const relativePath = Path.relative(sourceDirName, path);
             normalizedSpecifier = format(relativePath, true);
           }
         }

@@ -66,17 +66,17 @@ export const importPathBaseUrlRule = createRule<Options, MessageId>({
     function validateModuleSpecifier(
       expression: TSESTree.Literal | TSESTree.TemplateLiteral,
     ): void {
-      let sourceFileName = context.getFilename();
+      const sourceFileName = context.getFilename();
 
-      let helper = moduleSpecifierHelper;
+      const helper = moduleSpecifierHelper;
 
       if (!helper.isPathWithinBaseUrlDir(sourceFileName)) {
         return;
       }
 
-      let specifier = getModuleSpecifier(context.getSourceCode(), expression);
+      const specifier = getModuleSpecifier(context.getSourceCode(), expression);
 
-      let fullSpecifierPath = helper.resolve(specifier);
+      const fullSpecifierPath = helper.resolve(specifier);
 
       if (
         !fullSpecifierPath ||
@@ -85,24 +85,24 @@ export const importPathBaseUrlRule = createRule<Options, MessageId>({
         return;
       }
 
-      let relative = isRelativeModuleSpecifier(specifier);
+      const relative = isRelativeModuleSpecifier(specifier);
 
-      let relativeSourcePath =
+      const relativeSourcePath =
         helper.getRelativePathToBaseUrlDir(sourceFileName);
 
-      let firstSegmentOfRelativeSourcePath =
+      const firstSegmentOfRelativeSourcePath =
         getFirstSegmentOfPath(relativeSourcePath);
 
-      let relativeSpecifierPath =
+      const relativeSpecifierPath =
         helper.getRelativePathToBaseUrlDir(fullSpecifierPath);
 
-      let firstSegmentOfSpecifierPath = getFirstSegmentOfPath(
+      const firstSegmentOfSpecifierPath = getFirstSegmentOfPath(
         relativeSpecifierPath,
       );
 
       if (firstSegmentOfRelativeSourcePath === firstSegmentOfSpecifierPath) {
         if (!relative) {
-          let relativeSpecifier = `'${helper.build(fullSpecifierPath, false)}'`;
+          const relativeSpecifier = `'${helper.build(fullSpecifierPath, false)}'`;
 
           context.report({
             node: expression,
@@ -117,7 +117,7 @@ export const importPathBaseUrlRule = createRule<Options, MessageId>({
         }
       } else {
         if (relative) {
-          let baseUrlSpecifier = `'${helper.build(fullSpecifierPath, true)}'`;
+          const baseUrlSpecifier = `'${helper.build(fullSpecifierPath, true)}'`;
 
           context.report({
             node: expression,
@@ -130,9 +130,9 @@ export const importPathBaseUrlRule = createRule<Options, MessageId>({
       }
     }
 
-    let imports = findImports(context, ImportKind.AllStaticImports);
+    const imports = findImports(context, ImportKind.AllStaticImports);
 
-    for (let expression of imports) {
+    for (const expression of imports) {
       validateModuleSpecifier(expression);
     }
 

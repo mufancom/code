@@ -66,7 +66,7 @@ export const importPathStrictHierarchyRule = createRule<Options, MessageId>({
   ],
 
   create(context, [options]) {
-    let parsedOptions = options || [];
+    const parsedOptions = options || [];
 
     class ImportPathStrictHierarchyWalker {
       private moduleSpecifierHelper = new ModuleSpecifierHelper(
@@ -75,23 +75,23 @@ export const importPathStrictHierarchyRule = createRule<Options, MessageId>({
       );
 
       walk(): void {
-        let {hierarchy} = parsedOptions;
+        const {hierarchy} = parsedOptions;
 
-        let sourceNameToShallowlyAllowedNameSetMap = new Map<
+        const sourceNameToShallowlyAllowedNameSetMap = new Map<
           string,
           Set<string>
         >();
 
-        for (let [sourceName, allowedNames] of Object.entries(hierarchy)) {
+        for (const [sourceName, allowedNames] of Object.entries(hierarchy)) {
           sourceNameToShallowlyAllowedNameSetMap.set(
             sourceName,
             new Set(allowedNames),
           );
         }
 
-        let imports = findImports(context, ImportKind.AllImports);
+        const imports = findImports(context, ImportKind.AllImports);
 
-        for (let expression of imports) {
+        for (const expression of imports) {
           this.validateModuleSpecifier(
             expression,
             sourceNameToShallowlyAllowedNameSetMap,
@@ -103,10 +103,10 @@ export const importPathStrictHierarchyRule = createRule<Options, MessageId>({
         expression: TSESTree.LiteralExpression,
         sourceNameToAllowedNameSetMap: Map<string, Set<string>>,
       ): void {
-        let helper = this.moduleSpecifierHelper;
+        const helper = this.moduleSpecifierHelper;
 
-        let specifier = getModuleSpecifier(context.getSourceCode(), expression);
-        let {path: specifierPath, category} =
+        const specifier = getModuleSpecifier(context.getSourceCode(), expression);
+        const {path: specifierPath, category} =
           helper.resolveWithCategory(specifier);
 
         if (
@@ -116,22 +116,22 @@ export const importPathStrictHierarchyRule = createRule<Options, MessageId>({
           return;
         }
 
-        let projectDirName = helper.baseUrlDirName || helper.projectDirName;
-        let sourceFileName = helper.sourceFileName;
+        const projectDirName = helper.baseUrlDirName || helper.projectDirName;
+        const sourceFileName = helper.sourceFileName;
 
-        let specifierPathRelativeToProjectDir = Path.relative(
+        const specifierPathRelativeToProjectDir = Path.relative(
           projectDirName,
           specifierPath,
         );
-        let sourceFileNameRelativeToProjectDir = Path.relative(
+        const sourceFileNameRelativeToProjectDir = Path.relative(
           projectDirName,
           sourceFileName,
         );
 
-        let relativeSpecifierPathFirstSegment = getFirstSegmentOfPath(
+        const relativeSpecifierPathFirstSegment = getFirstSegmentOfPath(
           specifierPathRelativeToProjectDir,
         );
-        let relativeSourceFileNameFirstSegment =
+        const relativeSourceFileNameFirstSegment =
           sourceFileNameRelativeToProjectDir.includes(Path.sep)
             ? getFirstSegmentOfPath(sourceFileNameRelativeToProjectDir)
             : removeModuleFileExtension(sourceFileNameRelativeToProjectDir);
@@ -145,7 +145,7 @@ export const importPathStrictHierarchyRule = createRule<Options, MessageId>({
           return;
         }
 
-        let allowedSet = sourceNameToAllowedNameSetMap.get(
+        const allowedSet = sourceNameToAllowedNameSetMap.get(
           relativeSourceFileNameFirstSegment,
         );
 

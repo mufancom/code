@@ -1,12 +1,12 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
-import type {TSESTree} from '@typescript-eslint/utils';
+import type {TSESTree} from '@typeScript-eslint/utils';
 import {CachedInputFileSystem, ResolverFactory} from 'enhanced-resolve';
 import * as JSON5 from 'json5';
 import _ from 'lodash';
 import {isNodeBuiltIn} from 'module-lens';
-import Typescript from 'typescript';
+import TypeScript from 'typeScript';
 
 import {createRule, getParserServices} from './@utils';
 
@@ -50,14 +50,14 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
   defaultOptions: [{}],
 
   create(context, [options]) {
-    let parserServices = getParserServices(context);
+    const parserServices = getParserServices(context);
 
-    let projectReferences = parserServices.program.getProjectReferences();
-    let outDirs = _.compact(
+    const projectReferences = parserServices.program.getProjectReferences();
+    const outDirs = _.compact(
       projectReferences?.map(projectReference => {
-        let projectTSconfigPath = Typescript.findConfigFile(
+        const projectTSconfigPath = TypeScript.findConfigFile(
           FS.realpathSync.native(projectReference.path),
-          Typescript.sys.fileExists,
+          TypeScript.sys.fileExists,
         );
 
         if (!projectTSconfigPath) {
@@ -83,7 +83,7 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
       }),
     );
 
-    let rmpResolver = ResolverFactory.createResolver({
+    const rmpResolver = ResolverFactory.createResolver({
       extensions: options?.extensions || [
         '.ts',
         '.tsx',
@@ -100,7 +100,7 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
 
     return {
       ImportDeclaration: (node: TSESTree.ImportDeclaration) => {
-        let moduleSpecifierNode = node.source;
+        const moduleSpecifierNode = node.source;
 
         check(moduleSpecifierNode);
       },
@@ -109,12 +109,12 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
           return;
         }
 
-        let moduleSpecifierNode = node.moduleReference.expression;
+        const moduleSpecifierNode = node.moduleReference.expression;
 
         check(moduleSpecifierNode);
       },
       ImportExpression: (node: TSESTree.ImportExpression) => {
-        let moduleSpecifierNode = node.source;
+        const moduleSpecifierNode = node.source;
 
         check(moduleSpecifierNode);
       },
@@ -125,7 +125,7 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
         return;
       }
 
-      let moduleSpecifier = moduleSpecifierNode.value?.toString();
+      const moduleSpecifier = moduleSpecifierNode.value?.toString();
 
       if (!moduleSpecifier) {
         return;
@@ -136,7 +136,7 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
       }
 
       try {
-        let projectPath = rmpResolver.resolveSync(
+        const projectPath = rmpResolver.resolveSync(
           {},
           Path.dirname(context.getFilename()),
           moduleSpecifier,
@@ -153,9 +153,9 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
           return;
         }
 
-        let tsconfigPath = Typescript.findConfigFile(
+        const tsconfigPath = TypeScript.findConfigFile(
           Path.dirname(context.getFilename()),
-          Typescript.sys.fileExists,
+          TypeScript.sys.fileExists,
         );
 
         if (!tsconfigPath) {
@@ -166,7 +166,7 @@ export const referenceMissingProofRule = createRule<Options, MessageId>({
           return;
         }
 
-        let isInReferences =
+        const isInReferences =
           projectReferences?.some(reference =>
             pathStartsWith(
               projectPath as string,

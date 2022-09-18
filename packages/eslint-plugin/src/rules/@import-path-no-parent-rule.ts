@@ -36,12 +36,12 @@ export const importPathNoParentRule = createRule<Options, MessageId>({
   create(context) {
     class ImportPathNoParentWalker {
       walk(): void {
-        let sourceFileName = context.getFilename();
-        let sourceDirName = Path.dirname(sourceFileName);
+        const sourceFileName = context.getFilename();
+        const sourceDirName = Path.dirname(sourceFileName);
 
-        let imports = findImports(context, ImportKind.AllImports);
+        const imports = findImports(context, ImportKind.AllImports);
 
-        for (let expression of imports) {
+        for (const expression of imports) {
           this.validateModuleSpecifier(expression, sourceDirName);
         }
       }

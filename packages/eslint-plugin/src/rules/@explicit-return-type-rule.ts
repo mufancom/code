@@ -98,7 +98,7 @@ export const explicitReturnTypeRule = createRule<Options, MessageId>({
       constructor(private readonly typeChecker: TypeChecker) {}
 
       walk(sourceFile: SourceFile): void {
-        let callback = (node: Node): void => {
+        const callback = (node: Node): void => {
           if (
             isArrowFunction(node) ||
             isFunctionDeclaration(node) ||
@@ -132,16 +132,16 @@ export const explicitReturnTypeRule = createRule<Options, MessageId>({
           return undefined;
         }
 
-        let callSignature = nodeType.getCallSignatures()[0];
-        let returnType = callSignature
+        const callSignature = nodeType.getCallSignatures()[0];
+        const returnType = callSignature
           ? callSignature.getReturnType()
           : nodeType;
 
-        let returnTypeString = this.typeChecker.typeToString(returnType);
+        const returnTypeString = this.typeChecker.typeToString(returnType);
 
         let primitiveReturnType = returnTypeString;
 
-        let promiseMatchResult = returnTypeString.match(
+        const promiseMatchResult = returnTypeString.match(
           PROMISE_RETURN_TYPE_REGEX,
         );
 
@@ -149,7 +149,7 @@ export const explicitReturnTypeRule = createRule<Options, MessageId>({
           primitiveReturnType = promiseMatchResult[1];
         }
 
-        let {complexTypeFixer = false} = options;
+        const {complexTypeFixer = false} = options;
 
         if (
           !complexTypeFixer &&
@@ -168,13 +168,13 @@ export const explicitReturnTypeRule = createRule<Options, MessageId>({
           return undefined;
         }
 
-        let missingReturnTypeString = this.getMissingReturnTypeString(node);
+        const missingReturnTypeString = this.getMissingReturnTypeString(node);
 
         if (!missingReturnTypeString) {
           return undefined;
         }
 
-        let closeParenToken = getChildOfKind(node, SyntaxKind.CloseParenToken);
+        const closeParenToken = getChildOfKind(node, SyntaxKind.CloseParenToken);
 
         if (!closeParenToken) {
           return undefined;
@@ -208,7 +208,7 @@ export const explicitReturnTypeRule = createRule<Options, MessageId>({
       }
 
       private checkExpressionType(node: Node): boolean {
-        let parent = node.parent;
+        const parent = node.parent;
 
         if (!parent) {
           return false;
@@ -249,7 +249,7 @@ export const explicitReturnTypeRule = createRule<Options, MessageId>({
 
         if (isReturnStatement(parent)) {
           // return () => {};
-          let functionLikeParent = getFunctionLikeParent(parent);
+          const functionLikeParent = getFunctionLikeParent(parent);
 
           if (
             functionLikeParent &&
@@ -282,10 +282,10 @@ export const explicitReturnTypeRule = createRule<Options, MessageId>({
     function isModifiedWithAsync(
       node: ReturnTypeRelatedFunctionLikeDeclaration,
     ): boolean {
-      let {modifiers} = node;
+      const {modifiers} = node;
 
       if (modifiers && modifiers.length) {
-        for (let modifier of modifiers) {
+        for (const modifier of modifiers) {
           if (modifier.kind === SyntaxKind.AsyncKeyword) {
             return true;
           }

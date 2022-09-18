@@ -1,7 +1,9 @@
-import {AST_NODE_TYPES, TSESLint, TSESTree} from '@typescript-eslint/utils';
-import {
+import type { TSESLint, TSESTree} from '@typescript-eslint/utils';
+import {AST_NODE_TYPES} from '@typescript-eslint/utils';
+import type {
   FunctionLikeDeclaration,
-  Node,
+  Node} from 'typescript';
+import {
   isArrowFunction,
   isConstructorDeclaration,
   isFunctionDeclaration,
@@ -61,7 +63,7 @@ export function getFullStart(
   sourceCode: TSESLint.SourceCode,
   node: TSESTree.Node,
 ): number {
-  let token = sourceCode.getTokenBefore(node);
+  const token = sourceCode.getTokenBefore(node);
 
   // eslint-disable-next-line no-null/no-null
   return token === null ? 0 : token.range[1];
@@ -102,7 +104,7 @@ export function findImports(
 ): TextualLiteral[] {
   const result: TextualLiteral[] = [];
 
-  for (let node of findImportLikeNodes(context, kinds)) {
+  for (const node of findImportLikeNodes(context, kinds)) {
     switch (node.type) {
       case AST_NODE_TYPES.ImportDeclaration:
         addIfTextualLiteral(node.source);
@@ -239,7 +241,7 @@ class ImportFinder {
       return;
     }
 
-    let {
+    const {
       body: {type: declarationBodyType, body: statements},
     } = declaration;
 

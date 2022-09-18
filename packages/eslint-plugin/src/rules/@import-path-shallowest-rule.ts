@@ -61,20 +61,20 @@ export const importPathShallowestRule = createRule<Options, MessageId>({
       );
 
       walk(): void {
-        let imports = findImports(context, ImportKind.AllImports);
+        const imports = findImports(context, ImportKind.AllImports);
 
-        for (let expression of imports) {
+        for (const expression of imports) {
           this.validate(expression);
         }
       }
 
       private validate(expression: TSESTree.LiteralExpression): void {
-        let helper = this.moduleSpecifierHelper;
-        let specifier = getModuleSpecifier(context.getSourceCode(), expression);
+        const helper = this.moduleSpecifierHelper;
+        const specifier = getModuleSpecifier(context.getSourceCode(), expression);
 
-        let {category, path} = helper.resolveWithCategory(specifier);
+        const {category, path} = helper.resolveWithCategory(specifier);
 
-        let sourceFileName = context.getFilename();
+        const sourceFileName = context.getFilename();
 
         if (
           !path ||
@@ -88,7 +88,7 @@ export const importPathShallowestRule = createRule<Options, MessageId>({
           return;
         }
 
-        let parentDirName = Path.dirname(path);
+        const parentDirName = Path.dirname(path);
 
         if (!hasIndexFile(parentDirName)) {
           return;
@@ -102,12 +102,12 @@ export const importPathShallowestRule = createRule<Options, MessageId>({
     }
 
     function hasIndexFile(dirName: string): boolean {
-      let possibleIndexPaths = MODULE_EXTENSIONS.map(extension =>
+      const possibleIndexPaths = MODULE_EXTENSIONS.map(extension =>
         Path.join(dirName, `index${extension}`),
       );
 
       return possibleIndexPaths.some(path => {
-        let stats = gentleStat(path);
+        const stats = gentleStat(path);
         return !!stats && stats.isFile();
       });
     }

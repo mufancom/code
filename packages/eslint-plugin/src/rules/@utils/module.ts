@@ -1,9 +1,10 @@
 import * as Path from 'path';
 
-import {TSESLint, TSESTree} from '@typescript-eslint/utils';
+import type {TSESLint, TSESTree} from '@typescript-eslint/utils';
 import _ from 'lodash';
+import type {
+  ResolveWithCategoryResult} from 'module-lens';
 import {
-  ResolveWithCategoryResult,
   build,
   resolve,
   resolveWithCategory,
@@ -78,7 +79,7 @@ export class ModuleSpecifierHelper {
   }
 
   private requireBaseUrlDirName(): string {
-    let dirName = this.baseUrlDirName;
+    const dirName = this.baseUrlDirName;
 
     if (!dirName) {
       throw new Error(

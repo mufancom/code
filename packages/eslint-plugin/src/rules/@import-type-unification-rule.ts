@@ -374,7 +374,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
   ...ruleBody,
   defaultOptions: [{}],
   create(context, [options]) {
-    let filePath = context.getFilename();
+    const filePath = context.getFilename();
 
     let modulePathToReportInfoDict: Dict<ReportInfo> = {};
     let filePathToModulePaths: Dict<ModulePaths> = {};
@@ -402,12 +402,12 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
     waitForReadingOrWriting();
 
-    let cachePathStats = gentleStat(cachePath);
+    const cachePathStats = gentleStat(cachePath);
 
     if (cachePathStats?.isFile()) {
-      let cacheFilebuffer = FS.readFileSync(cachePath);
+      const cacheFilebuffer = FS.readFileSync(cachePath);
 
-      let cache = JSON.parse(cacheFilebuffer.toString());
+      const cache = JSON.parse(cacheFilebuffer.toString());
 
       modulePathToReportInfoDict = cache.modulePathToReportInfoDict;
       filePathToModulePaths = cache.filePathToModulePaths;
@@ -415,10 +415,10 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       throw new Error('Intended cache path is occupied by a directory');
     }
 
-    let newModulePaths = [];
+    const newModulePaths = [];
 
-    for (let modulePath of filePathToModulePaths[filePath]?.modulePaths || []) {
-      let reportInfo = modulePathToReportInfoDict[modulePath];
+    for (const modulePath of filePathToModulePaths[filePath]?.modulePaths || []) {
+      const reportInfo = modulePathToReportInfoDict[modulePath];
 
       if (reportInfo?.importIdentifyInfos) {
         _.remove(reportInfo.importIdentifyInfos, {filePath});
@@ -444,8 +444,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       context.parserServices.program &&
       context.parserServices.esTreeNodeToTSNodeMap
     ) {
-      let parserServices = context.parserServices as RequiredParserServices;
-      let baseUrlDirName = parserServices.program.getCompilerOptions().baseUrl;
+      const parserServices = context.parserServices as RequiredParserServices;
+      const baseUrlDirName = parserServices.program.getCompilerOptions().baseUrl;
 
       walkNode(
         context.getSourceCode().ast,
@@ -459,7 +459,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
             }
 
             case 'TSImportEqualsDeclaration': {
-              let moduleReference = node.moduleReference;
+              const moduleReference = node.moduleReference;
 
               if (
                 moduleReference.type !== 'TSExternalModuleReference' ||
@@ -468,7 +468,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
                 return;
               }
 
-              let moduleSpecifier = moduleReference.expression.value as
+              const moduleSpecifier = moduleReference.expression.value as
                 | string
                 | null;
 
@@ -476,7 +476,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
                 return;
               }
 
-              let importInfos = resolveEveryImportTypeAndIdentifier(node);
+              const importInfos = resolveEveryImportTypeAndIdentifier(node);
 
               addReportInfoAndReportErrors(moduleSpecifier, importInfos, {
                 baseUrlDirName,
@@ -517,11 +517,11 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       );
     }
 
-    let message = {
+    const message = {
       modulePathToReportInfoDict,
       filePathToModulePaths,
     };
-    let encodeString = JSON.stringify(message);
+    const encodeString = JSON.stringify(message);
 
     FS.writeFileSync(cachePath, encodeString);
 
@@ -534,23 +534,23 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       visitorKeys: SourceCode.VisitorKeys,
       callback: (node: TSESTree.Node) => void,
     ): void {
-      let queue: TSESTree.Node[] = [];
+      const queue: TSESTree.Node[] = [];
 
       queue.push(rootNode);
 
       while (queue.length > 0) {
-        let node = queue.shift()!;
+        const node = queue.shift()!;
 
         callback(node);
 
-        let visitorKeysOfSpecificType = visitorKeys[node.type];
+        const visitorKeysOfSpecificType = visitorKeys[node.type];
 
         if (!visitorKeysOfSpecificType) {
           continue;
         }
 
-        for (let visitorKey of visitorKeysOfSpecificType) {
-          let children = node[visitorKey as keyof TSESTree.Node] as
+        for (const visitorKey of visitorKeysOfSpecificType) {
+          const children = node[visitorKey as keyof TSESTree.Node] as
             | TSESTree.Node
             | TSESTree.Node[]
             | undefined;
@@ -558,7 +558,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
           if (!children) {
             continue;
           } else if (Array.isArray(children)) {
-            for (let child of children) {
+            for (const child of children) {
               if (child) {
                 queue.push(child);
               }
@@ -583,14 +583,14 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         (declaration.type === 'ExportNamedDeclaration' &&
           !!(declaration.source as TSESTree.Literal)?.value)
       ) {
-        let isTypeImport =
+        const isTypeImport =
           declaration.type === 'ImportDeclaration'
             ? declaration.importKind === 'type'
             : declaration.exportKind === 'type';
 
         return _.compact(
           declaration.specifiers.map(specifier => {
-            let localIdentifier = specifier.local;
+            const localIdentifier = specifier.local;
 
             switch (specifier.type) {
               case 'ImportDefaultSpecifier':
@@ -673,8 +673,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       referenceName: string,
       name: string,
     ): boolean {
-      let unifiedReferenceName = referenceName.toLowerCase();
-      let unifiedName = name.toLowerCase();
+      const unifiedReferenceName = referenceName.toLowerCase();
+      const unifiedName = name.toLowerCase();
 
       switch (namingType) {
         case 'as-is':
@@ -707,7 +707,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       importTypes: string[],
       importType: ImportType,
     ): boolean {
-      let isTypeImport = importType.startsWith('type');
+      const isTypeImport = importType.startsWith('type');
 
       if (
         importTypes.filter(importType =>
@@ -723,8 +723,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
     }
 
     function deleteImportIdentityInfo(path: string): void {
-      for (let modulePath of filePathToModulePaths[path]?.modulePaths || []) {
-        let reportInfo = modulePathToReportInfoDict[modulePath];
+      for (const modulePath of filePathToModulePaths[path]?.modulePaths || []) {
+        const reportInfo = modulePathToReportInfoDict[modulePath];
 
         if (reportInfo?.importIdentifyInfos) {
           _.remove(reportInfo.importIdentifyInfos, {filePath: path});
@@ -742,15 +742,15 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       reportMessageId: 'importTypeNotUnified' | 'notMatchConfiguration',
       moduleSpecifier: string,
     ): boolean {
-      let importIdentifyInfos = importTypeToImportIdentifyInfosDict[importType];
+      const importIdentifyInfos = importTypeToImportIdentifyInfosDict[importType];
 
       if (importIdentifyInfos.length === 1) {
         return false;
       }
 
-      let importIdentifyInfo = importIdentifyInfos.find(importIdentifyInfo => {
+      const importIdentifyInfo = importIdentifyInfos.find(importIdentifyInfo => {
         if (importIdentifyInfo.identifier!.name !== identifier.name) {
-          let stat = gentleStat(importIdentifyInfo.filePath);
+          const stat = gentleStat(importIdentifyInfo.filePath);
 
           if (!stat) {
             deleteImportIdentityInfo(importIdentifyInfo.filePath);
@@ -766,7 +766,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         return false;
       }
 
-      let anotherIdentifier = importIdentifyInfo.identifier!;
+      const anotherIdentifier = importIdentifyInfo.identifier!;
 
       context.report({
         node: identifier,
@@ -780,13 +780,13 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         },
       });
 
-      let reportedImportInfo = importIdentifyInfo;
+      const reportedImportInfo = importIdentifyInfo;
 
-      let notReportedImportTypeToImportIdentifyInfos =
+      const notReportedImportTypeToImportIdentifyInfos =
         notReportedImportTypeToImportIdentifyInfosDict[importType];
 
       if (notReportedImportTypeToImportIdentifyInfos) {
-        for (let info of notReportedImportTypeToImportIdentifyInfos) {
+        for (const info of notReportedImportTypeToImportIdentifyInfos) {
           info.reported = true;
 
           if (info.filePath === filePath) {
@@ -837,7 +837,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       importInfos: ImportInfo[],
       additionalOptions?: TypeUnificationAdditionalOptions,
     ): void {
-      let {path} = resolveWithCategory(moduleSpecifier, {
+      const {path} = resolveWithCategory(moduleSpecifier, {
         sourceFileName: context.getFilename(),
         baseUrlDirName: additionalOptions?.baseUrlDirName,
       });
@@ -855,15 +855,15 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         };
       }
 
-      let quickConfig = options.quickConfigs?.find(config =>
+      const quickConfig = options.quickConfigs?.find(config =>
         config.modules.find(name => name === moduleSpecifier),
       );
-      let config = options.configs?.find(
+      const config = options.configs?.find(
         exception => exception.module === moduleSpecifier,
       );
 
-      let newImportIdentifyInfos = importInfos.map(importInfo => {
-        let info = new ImportIdentifyInfo();
+      const newImportIdentifyInfos = importInfos.map(importInfo => {
+        const info = new ImportIdentifyInfo();
 
         if (filePathToModulePaths[filePath]) {
           filePathToModulePaths[filePath].modulePaths = _.union(
@@ -922,11 +922,11 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         return info;
       });
 
-      let notReportedImportIdentifyInfos =
+      const notReportedImportIdentifyInfos =
         reportInfo.importIdentifyInfos.filter(
           importIdentifyInfo => !importIdentifyInfo.reported,
         );
-      let notReportedGroups = _.groupBy(
+      const notReportedGroups = _.groupBy(
         notReportedImportIdentifyInfos,
         'importType',
       );
@@ -941,9 +941,9 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         ),
       );
 
-      let groups = _.groupBy(reportInfo.importIdentifyInfos, 'importType');
-      let importTypeToImportIdentifyInfosDict: Dict<ImportIdentifyInfo[]> = {};
-      let importTypes = Object.keys(groups).filter(
+      const groups = _.groupBy(reportInfo.importIdentifyInfos, 'importType');
+      const importTypeToImportIdentifyInfosDict: Dict<ImportIdentifyInfo[]> = {};
+      const importTypes = Object.keys(groups).filter(
         importType =>
           importType !== 'named' &&
           importType !== 'export-named' &&
@@ -953,7 +953,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
           importType !== 'type-export-namespace',
       );
 
-      for (let importType of Object.keys(groups)) {
+      for (const importType of Object.keys(groups)) {
         importTypeToImportIdentifyInfosDict[importType] = _.uniqBy(
           groups[importType],
           importIdentifyInfo => importIdentifyInfo.identifier?.name,
@@ -961,10 +961,10 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       }
 
       for (let i = 0; i < newImportIdentifyInfos.length; ++i) {
-        let info = newImportIdentifyInfos[i];
-        let isConfiguredModule = Boolean(quickConfig || config);
-        let allowedTypeInfos = config?.allow;
-        let {
+        const info = newImportIdentifyInfos[i];
+        const isConfiguredModule = Boolean(quickConfig || config);
+        const allowedTypeInfos = config?.allow;
+        const {
           importType,
           identifier: localIdentifier,
           importedIdentifier,
@@ -1025,13 +1025,13 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
             let reportedImportInfo: ImportIdentifyInfo | undefined;
 
-            for (let anotherImportType of importTypes) {
+            for (const anotherImportType of importTypes) {
               if (
                 anotherImportType !== importType &&
                 importType.startsWith('type') ===
                   anotherImportType.startsWith('type')
               ) {
-                let anotherImportIdentifyInfo =
+                const anotherImportIdentifyInfo =
                   importTypeToImportIdentifyInfosDict[anotherImportType].find(
                     importIdentityInfo => {
                       if (gentleStat(importIdentityInfo.filePath)) {
@@ -1085,16 +1085,16 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               }
             }
 
-            for (let anotherImportType of importTypes.filter(
+            for (const anotherImportType of importTypes.filter(
               anotherImportType =>
                 importType.startsWith('type') ===
                 anotherImportType.startsWith('type'),
             )) {
-              let notReportedImportTypeToImportIdentifyInfos =
+              const notReportedImportTypeToImportIdentifyInfos =
                 notReportedGroups[anotherImportType];
 
               if (notReportedImportTypeToImportIdentifyInfos) {
-                for (let anotherInfo of notReportedImportTypeToImportIdentifyInfos) {
+                for (const anotherInfo of notReportedImportTypeToImportIdentifyInfos) {
                   if (anotherInfo.reported) {
                     continue;
                   }
@@ -1116,7 +1116,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
                     continue;
                   }
 
-                  let reportInfo =
+                  const reportInfo =
                     anotherInfo.filePath === filePath ? info : anotherInfo;
 
                   if (anotherImportType === 'export-all') {
@@ -1157,12 +1157,12 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
           // Prefer quick config
           if (quickConfig) {
-            let {defaultImportNamingType, namedImportNamingType} = quickConfig;
+            const {defaultImportNamingType, namedImportNamingType} = quickConfig;
 
             switch (importType) {
               case 'default':
               case 'type-default': {
-                let importNamingType = defaultImportNamingType ?? 'as-is';
+                const importNamingType = defaultImportNamingType ?? 'as-is';
 
                 if (
                   !isNamingTypeMatch(
@@ -1190,7 +1190,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               case 'export-named':
               case 'type-named':
               case 'type-export-named': {
-                let importNamingType = namedImportNamingType ?? 'as-is';
+                const importNamingType = namedImportNamingType ?? 'as-is';
 
                 if (
                   !isNamingTypeMatch(
@@ -1228,7 +1228,7 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
           }
 
           if (allowedTypeInfos) {
-            for (let allowedTypeInfo of allowedTypeInfos) {
+            for (const allowedTypeInfo of allowedTypeInfos) {
               if (typeof allowedTypeInfo === 'string') {
                 if (allowedTypeInfo !== importType) {
                   continue;
@@ -1325,13 +1325,13 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       baseUrlDirName?: string,
     ): RuleFunction<TSESTree.ImportDeclaration> {
       return node => {
-        let moduleSpecifier = node.source.value as string | null;
+        const moduleSpecifier = node.source.value as string | null;
 
         if (node.source.type !== 'Literal' || !moduleSpecifier) {
           return;
         }
 
-        let importInfos = resolveEveryImportTypeAndIdentifier(node);
+        const importInfos = resolveEveryImportTypeAndIdentifier(node);
 
         addReportInfoAndReportErrors(moduleSpecifier, importInfos, {
           baseUrlDirName,
@@ -1345,14 +1345,14 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       TSESTree.ExportAllDeclaration | TSESTree.ExportNamedDeclaration
     > {
       return declaration => {
-        let moduleSpecifier = (declaration.source as TSESTree.Literal)
+        const moduleSpecifier = (declaration.source as TSESTree.Literal)
           ?.value as string | null | undefined;
 
         if (declaration.source?.type !== 'Literal' || !moduleSpecifier) {
           return;
         }
 
-        let importInfos = resolveEveryImportTypeAndIdentifier(declaration);
+        const importInfos = resolveEveryImportTypeAndIdentifier(declaration);
 
         addReportInfoAndReportErrors(moduleSpecifier, importInfos, {
           baseUrlDirName,

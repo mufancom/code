@@ -97,7 +97,7 @@ export const importGroupsRule = createRule<Options, MessageId>({
     const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
       '$node-core': specifier => isNodeBuiltIn(specifier),
       '$node-modules': (specifier, sourceFileName) => {
-        let result = resolveWithCategory(specifier, {sourceFileName});
+        const result = resolveWithCategory(specifier, {sourceFileName});
         return result.category === 'node-modules';
       },
     };
@@ -159,7 +159,7 @@ export const importGroupsRule = createRule<Options, MessageId>({
             BUILT_IN_MODULE_GROUP_TESTER_DICT[config] || ((): boolean => false)
           );
         } else {
-          let regex = new RegExp(config);
+          const regex = new RegExp(config);
           return (path): boolean => regex.test(path);
         }
       }
@@ -186,7 +186,7 @@ export const importGroupsRule = createRule<Options, MessageId>({
       walk(): void {
         let pendingCache: TSESTree.ProgramStatement[] = [];
 
-        let checkWithAppendModuleImport = (
+        const checkWithAppendModuleImport = (
           expression: TSESTree.Expression,
           sideEffect: boolean,
         ): void => {
@@ -198,7 +198,7 @@ export const importGroupsRule = createRule<Options, MessageId>({
           }
         };
 
-        for (let statement of context.getSourceCode().ast.body) {
+        for (const statement of context.getSourceCode().ast.body) {
           if (statement.type === AST_NODE_TYPES.ImportDeclaration) {
             checkWithAppendModuleImport(
               statement.source,
@@ -235,14 +235,14 @@ export const importGroupsRule = createRule<Options, MessageId>({
           node = node.parent;
         }
 
-        let specifier = getModuleSpecifier(context.getSourceCode(), expression);
+        const specifier = getModuleSpecifier(context.getSourceCode(), expression);
 
-        let sourceFileName = context.getFilename();
+        const sourceFileName = context.getFilename();
 
-        let {groups: groupConfigItems, baseUrl} = options as RawOptions;
-        let groups = groupConfigItems.map(item => new ModuleGroup(item));
+        const {groups: groupConfigItems, baseUrl} = options as RawOptions;
+        const groups = groupConfigItems.map(item => new ModuleGroup(item));
 
-        let helper = this.moduleSpecifierHelper;
+        const helper = this.moduleSpecifierHelper;
 
         let usingBaseUrl = false;
 
@@ -250,18 +250,18 @@ export const importGroupsRule = createRule<Options, MessageId>({
           typeof baseUrl === 'string' &&
           !isRelativeModuleSpecifier(specifier)
         ) {
-          let path = helper.resolve(specifier);
+          const path = helper.resolve(specifier);
 
           if (path && helper.isPathWithinBaseUrlDir(path)) {
             usingBaseUrl = true;
           }
         }
 
-        let index = groups.findIndex(group =>
+        const index = groups.findIndex(group =>
           group.match(specifier, sideEffect, usingBaseUrl, sourceFileName),
         );
 
-        let start = node.range[0];
+        const start = node.range[0];
 
         let fullStart = start;
 
@@ -281,12 +281,12 @@ export const importGroupsRule = createRule<Options, MessageId>({
           }
         }
 
-        let precedingText = context
+        const precedingText = context
           .getSourceCode()
           .getText(node, start - fullStart)
           .slice(0, start - fullStart);
 
-        let emptyLinesBeforeStart = (
+        const emptyLinesBeforeStart = (
           precedingText.replace(/^.*\r?\n/, '').match(/^\s*$/gm) || []
         ).length;
 
@@ -300,8 +300,8 @@ export const importGroupsRule = createRule<Options, MessageId>({
       }
 
       private validate(): void {
-        let infos = this.moduleImportInfos;
-        let pendingStatements = this.pendingStatements;
+        const infos = this.moduleImportInfos;
+        const pendingStatements = this.pendingStatements;
 
         if (!infos.length) {
           return;
@@ -312,20 +312,20 @@ export const importGroupsRule = createRule<Options, MessageId>({
           messageId: MessageId;
         }
 
-        let {ordered} = options;
-        let failureItems: FailureItem[] = [];
+        const {ordered} = options;
+        const failureItems: FailureItem[] = [];
         let [lastInfo, ...restInfos] = infos;
-        let fixerEnabled = !pendingStatements.length;
-        let appearedGroupIndexSet = new Set([lastInfo.groupIndex]);
+        const fixerEnabled = !pendingStatements.length;
+        const appearedGroupIndexSet = new Set([lastInfo.groupIndex]);
 
-        for (let expression of pendingStatements) {
+        for (const expression of pendingStatements) {
           failureItems.push({
             node: expression,
             messageId: 'unexpectedCodeBetweenImports',
           });
         }
 
-        for (let info of restInfos) {
+        for (const info of restInfos) {
           let checkOrdering = ordered;
 
           if (info.groupIndex === lastInfo.groupIndex) {
@@ -375,20 +375,20 @@ export const importGroupsRule = createRule<Options, MessageId>({
         }
 
         if (failureItems.length) {
-          for (let {node, messageId} of failureItems) {
+          for (const {node, messageId} of failureItems) {
             if (fixerEnabled) {
               context.report({
                 node,
                 messageId,
                 fix: fixer => {
-                  let {ordered = false} = options;
+                  const {ordered = false} = options;
 
-                  let startNode = infos[0].node;
-                  let endNode = infos[infos.length - 1].node;
+                  const startNode = infos[0].node;
+                  const endNode = infos[infos.length - 1].node;
 
-                  let infoGroups = groupModuleImportInfos(infos, ordered);
+                  const infoGroups = groupModuleImportInfos(infos, ordered);
 
-                  let text = infoGroups
+                  const text = infoGroups
                     .map(group =>
                       group
                         .map(info =>
@@ -435,9 +435,9 @@ export const importGroupsRule = createRule<Options, MessageId>({
     ): ModuleImportInfo[][] {
       // 这里利用了 Map 和 Set 枚举顺序和键加入顺序一致的特性. 如果不需要按顺序分
       // 组, 则遵照分组出现顺序.
-      let infoGroupMap = new Map<number, ModuleImportInfo[]>();
+      const infoGroupMap = new Map<number, ModuleImportInfo[]>();
 
-      for (let info of infos) {
+      for (const info of infos) {
         let infoGroup = infoGroupMap.get(info.groupIndex);
 
         if (infoGroup) {

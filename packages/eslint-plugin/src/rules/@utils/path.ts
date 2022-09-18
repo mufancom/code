@@ -1,4 +1,4 @@
-import FS from 'fs';
+import * as FS from 'fs';
 import * as Path from 'path';
 
 export function isSubPathOf(
@@ -6,7 +6,7 @@ export function isSubPathOf(
   parentPath: string,
   allowExact = false,
 ): boolean {
-  let relativePath = Path.relative(parentPath, path);
+  const relativePath = Path.relative(parentPath, path);
 
   if (relativePath === '') {
     return allowExact;
@@ -16,7 +16,7 @@ export function isSubPathOf(
 }
 
 export function getFirstSegmentOfPath(path: string): string {
-  let [segment] = /^[^\\/]+/.exec(path) || [''];
+  const [segment] = /^[^\\/]+/.exec(path) || [''];
   return segment;
 }
 
@@ -28,9 +28,9 @@ export function searchUpperDir(from: string, searchName: string): string {
   let nextDirName = from;
 
   while (true) {
-    let currentDirName = nextDirName;
+    const currentDirName = nextDirName;
 
-    let searchPath = Path.join(currentDirName, searchName);
+    const searchPath = Path.join(currentDirName, searchName);
 
     if (FS.existsSync(searchPath)) {
       return currentDirName;

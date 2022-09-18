@@ -35,12 +35,12 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
     }
 
     const parserServices = getParserServices(context);
-    let typeChecker = parserServices.program.getTypeChecker();
+    const typeChecker = parserServices.program.getTypeChecker();
 
     function mapIteratorToArray(
       iterator: TypeScript.Iterator<TypeScript.__String>,
     ): string[] {
-      let result: string[] = [];
+      const result: string[] = [];
 
       for (
         let iterResult = iterator.next();
@@ -54,8 +54,8 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
     }
 
     function check(node: TSESTree.VariableDeclarator): void {
-      let typeAnnotation = node.id.typeAnnotation;
-      let init = node.init;
+      const typeAnnotation = node.id.typeAnnotation;
+      const init = node.init;
 
       if (
         !typeAnnotation ||
@@ -66,11 +66,11 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
         return;
       }
 
-      let comments = context
+      const comments = context
         .getSourceCode()
         .getCommentsBefore(typeAnnotation.typeAnnotation);
 
-      let strictOrderSpecified = _.some(
+      const strictOrderSpecified = _.some(
         comments.map(comment => {
           return comment.value.trim() === 'strict-key-order';
         }),
@@ -80,18 +80,18 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
         return;
       }
 
-      let typeNode = parserServices.esTreeNodeToTSNodeMap.get(
+      const typeNode = parserServices.esTreeNodeToTSNodeMap.get(
         typeAnnotation.typeAnnotation,
       );
 
-      let typeNodeMembers =
+      const typeNodeMembers =
         typeChecker.getTypeAtLocation(typeNode).symbol.members;
 
-      let typeKeys = typeNodeMembers
+      const typeKeys = typeNodeMembers
         ? mapIteratorToArray(typeNodeMembers.keys())
         : [];
 
-      let propertyKeyInfos: PropertyKeyInfo[] = _.compact(
+      const propertyKeyInfos: PropertyKeyInfo[] = _.compact(
         init.properties.map((property, index) => {
           if (property.type !== AST_NODE_TYPES.Property) {
             return undefined;
@@ -108,21 +108,21 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
           return undefined;
         }),
       );
-      let propertyKeys = propertyKeyInfos.map(
+      const propertyKeys = propertyKeyInfos.map(
         propertyKeyInfo => propertyKeyInfo.key,
       );
 
-      let typeKeySet = new Set(typeKeys);
+      const typeKeySet = new Set(typeKeys);
 
-      let diffResult = jsdiff.diffArrays(typeKeys, propertyKeys);
+      const diffResult = jsdiff.diffArrays(typeKeys, propertyKeys);
 
       let propertyKeyIndex = 0;
 
-      for (let diffResultPart of diffResult) {
+      for (const diffResultPart of diffResult) {
         if (diffResultPart.added) {
           for (let i = 0; i < diffResultPart.value.length; ++i) {
-            let key = diffResultPart.value[i];
-            let property = init.properties[
+            const key = diffResultPart.value[i];
+            const property = init.properties[
               propertyKeyInfos[propertyKeyIndex + i].index
             ] as TSESTree.Property;
 

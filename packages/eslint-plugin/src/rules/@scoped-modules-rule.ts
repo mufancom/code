@@ -117,9 +117,9 @@ export const scopedModulesRule = createRule<Options, MessageId>({
         bannedPattern = BANNED_EXPORT_REGEX;
         messageId = 'bannedExport';
 
-        let fileName = context.getFilename();
+        const fileName = context.getFilename();
 
-        let baseName = getBaseNameWithoutExtension(fileName);
+        const baseName = getBaseNameWithoutExtension(fileName);
 
         if (baseName.startsWith('@')) {
           bannedPattern = BANNED_EXPORT_REGEX_FOR_AT_PREFIXED;
@@ -133,7 +133,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
           fix:
             type === 'export'
               ? fixer => {
-                  let tokenAfter = context
+                  const tokenAfter = context
                     .getSourceCode()
                     .getTokenAfter(statement);
 
@@ -154,8 +154,8 @@ export const scopedModulesRule = createRule<Options, MessageId>({
     }
 
     function validateIndexFile(infos: ModuleStatementInfo[]): void {
-      let fileName = context.getFilename();
-      let dirName = Path.dirname(fileName);
+      const fileName = context.getFilename();
+      const dirName = Path.dirname(fileName);
       let fileNames: string[];
 
       try {
@@ -167,13 +167,13 @@ export const scopedModulesRule = createRule<Options, MessageId>({
         return;
       }
 
-      let hasNamespaceFile =
+      const hasNamespaceFile =
         fileNames.filter(fileName => NAMESPACE_FILE_REGEX.test(fileName))
           .length >= 1;
 
       if (hasNamespaceFile) {
-        for (let info of infos) {
-          let {type, specifier, statement} = info;
+        for (const info of infos) {
+          const {type, specifier, statement} = info;
 
           /**
            *  When there's a namespace file in the directory, we should just export the namespace.
@@ -204,13 +204,13 @@ export const scopedModulesRule = createRule<Options, MessageId>({
           }
         }
 
-        let importSpecifiers = infos
+        const importSpecifiers = infos
           .filter(info => info.type === 'import' || info.type === 'export-as')
           .map(info => info.specifier);
 
-        let expectedImportSpecifiers = ['./namespace'];
+        const expectedImportSpecifiers = ['./namespace'];
 
-        let missingImportIds = _.difference(
+        const missingImportIds = _.difference(
           expectedImportSpecifiers,
           importSpecifiers,
         );
@@ -238,8 +238,8 @@ export const scopedModulesRule = createRule<Options, MessageId>({
     }
 
     function validateNamespaceFile(): void {
-      let fileName = context.getFilename();
-      let dirName = Path.dirname(fileName);
+      const fileName = context.getFilename();
+      const dirName = Path.dirname(fileName);
       let fileNames;
 
       try {
@@ -255,17 +255,17 @@ export const scopedModulesRule = createRule<Options, MessageId>({
     }
 
     function validateFile(dirName: string, fileNames: string[]): void {
-      let exportSpecifiers = infos
+      const exportSpecifiers = infos
         .filter(info => info.type === 'export')
         .map(info => info.specifier);
 
-      let expectedExportSpecifiers = fileNames
+      const expectedExportSpecifiers = fileNames
         .map((fileName): string | undefined => {
           if (fileName.startsWith('.')) {
             return undefined;
           }
 
-          let entryFullPath = Path.join(dirName, fileName);
+          const entryFullPath = Path.join(dirName, fileName);
           let stats;
 
           try {
@@ -295,7 +295,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
               return undefined;
             }
 
-            let hasIndexFile = entryNamesInFolder.some(entryNameInFolder =>
+            const hasIndexFile = entryNamesInFolder.some(entryNameInFolder =>
               INDEX_FILE_REGEX.test(entryNameInFolder),
             );
 
@@ -316,7 +316,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
         })
         .filter((entryName): entryName is string => !!entryName);
 
-      let missingExportSpecifiers = _.difference(
+      const missingExportSpecifiers = _.difference(
         expectedExportSpecifiers,
         exportSpecifiers.map(specifier =>
           isRelativeModuleSpecifier(specifier)
@@ -326,7 +326,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
       );
 
       if (missingExportSpecifiers.length) {
-        let jsExtension = exportSpecifiers.some(specifier =>
+        const jsExtension = exportSpecifiers.some(specifier =>
           /\.js$/.test(specifier),
         );
 
@@ -372,7 +372,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
 
     let infos: ModuleStatementInfo[] = [];
 
-    for (let statement of context.getSourceCode().ast.body) {
+    for (const statement of context.getSourceCode().ast.body) {
       let type: ModuleStatementType;
 
       switch (statement.type) {
@@ -392,7 +392,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
           continue;
       }
 
-      let specifier =
+      const specifier =
         statement.source && isStringLiteral(statement.source)
           ? getModuleSpecifier(context.getSourceCode(), statement.source)
               .replace(/^\'/, '')
@@ -411,12 +411,12 @@ export const scopedModulesRule = createRule<Options, MessageId>({
       } as ModuleStatementInfo);
     }
 
-    let fileName = context.getFilename();
+    const fileName = context.getFilename();
 
     if (INDEX_FILE_REGEX.test(fileName)) {
       validateIndexFile(infos);
     } else {
-      for (let info of infos) {
+      for (const info of infos) {
         validateImportOrExport(info);
       }
 

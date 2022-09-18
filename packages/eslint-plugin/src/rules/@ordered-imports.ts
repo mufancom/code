@@ -145,7 +145,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
   create(context, [options]) {
     type FixFunction = (fixer: TSESLint.RuleFixer) => TSESLint.RuleFix;
 
-    let reportDescriptors: {
+    const reportDescriptors: {
       node?: TSESTree.Node;
       loc?: TSESTree.SourceLocation | TSESTree.Position;
       messageId: MessageId;
@@ -873,13 +873,13 @@ export const orderedImportsRule = createRule<Options, MessageId>({
 
     const parserServices = getParserServices(context);
 
-    let sourceFile = parserServices.esTreeNodeToTSNodeMap.get(
+    const sourceFile = parserServices.esTreeNodeToTSNodeMap.get(
       context.getSourceCode().ast,
     );
 
     new Walker(sourceFile, parseOptions(options)).walk(sourceFile);
 
-    for (let reportDescriptor of reportDescriptors) {
+    for (const reportDescriptor of reportDescriptors) {
       if (reportDescriptor.node) {
         context.report({
           node: reportDescriptor.node,

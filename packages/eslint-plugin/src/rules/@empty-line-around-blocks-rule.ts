@@ -165,7 +165,7 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
       };
 
       private walkNextAffectedNode(node: Node): void {
-        let nextStatement = getNextSibling(node);
+        const nextStatement = getNextSibling(node);
 
         if (nextStatement && !isBlockIncludedNode(nextStatement)) {
           if (!this.checkNextAffectedNode(nextStatement, node)) {
@@ -246,7 +246,7 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
           return true;
         }
 
-        let parentSyntaxList = getParentSyntaxList(node);
+        const parentSyntaxList = getParentSyntaxList(node);
 
         if (parentSyntaxList && firstInSyntaxList(node, parentSyntaxList)) {
           return true;
@@ -270,7 +270,7 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
     }
 
     function validate(node: Node, validators: NodeValidator[]): boolean {
-      for (let validator of validators) {
+      for (const validator of validators) {
         if (validator(node)) {
           return true;
         }
@@ -332,9 +332,9 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
     }
 
     function getParentSyntaxList(node: Node): SyntaxList | undefined {
-      let parent = node.parent;
+      const parent = node.parent;
 
-      let siblingCount = parent.getChildCount();
+      const siblingCount = parent.getChildCount();
 
       if (
         isBlock(parent) ||
@@ -360,7 +360,7 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
     }
 
     function findInSyntaxList(node: Node, syntaxList: SyntaxList): number {
-      let childrenCount = syntaxList.getChildCount();
+      const childrenCount = syntaxList.getChildCount();
 
       for (let i = 0; i < childrenCount; i++) {
         if (syntaxList.getChildAt(i) === node) {
@@ -372,16 +372,16 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
     }
 
     function getNextSibling(node: Node): Node | undefined {
-      let assumedNext = getNextStatement(node as Statement);
+      const assumedNext = getNextStatement(node as Statement);
 
       if (assumedNext) {
         return assumedNext;
       }
 
-      let syntaxList = getParentSyntaxList(node);
+      const syntaxList = getParentSyntaxList(node);
 
       if (syntaxList) {
-        let nextPosition = findInSyntaxList(node, syntaxList) + 1;
+        const nextPosition = findInSyntaxList(node, syntaxList) + 1;
 
         if (nextPosition && nextPosition < syntaxList.getChildCount()) {
           return syntaxList.getChildAt(nextPosition);
@@ -394,19 +394,19 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
     function getFirstSignature<
       T extends FunctionDeclaration | MethodDeclaration,
     >(node: T): T | undefined {
-      let parentSyntaxList = getParentSyntaxList(node);
+      const parentSyntaxList = getParentSyntaxList(node);
 
-      let isSpecificDeclaration = isFunctionDeclaration(node)
+      const isSpecificDeclaration = isFunctionDeclaration(node)
         ? isFunctionDeclaration
         : isMethodDeclaration;
 
       if (parentSyntaxList && node.name) {
-        let position = findInSyntaxList(node, parentSyntaxList);
+        const position = findInSyntaxList(node, parentSyntaxList);
 
         let firstSignature: T | undefined;
 
         for (let i = position - 1; i >= 0; i--) {
-          let candidate = parentSyntaxList.getChildAt(i);
+          const candidate = parentSyntaxList.getChildAt(i);
 
           if (
             isSpecificDeclaration(candidate) &&
@@ -431,15 +431,15 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
     function getConstructorFirstSignature(
       node: ConstructorDeclaration,
     ): ConstructorDeclaration | undefined {
-      let parentSyntaxList = getParentSyntaxList(node);
+      const parentSyntaxList = getParentSyntaxList(node);
 
       if (parentSyntaxList) {
-        let position = findInSyntaxList(node, parentSyntaxList);
+        const position = findInSyntaxList(node, parentSyntaxList);
 
         let firstSignature: ConstructorDeclaration | undefined;
 
         for (let i = position - 1; i >= 0; i--) {
-          let candidate = parentSyntaxList.getChildAt(i);
+          const candidate = parentSyntaxList.getChildAt(i);
 
           if (isConstructorDeclaration(candidate) && !candidate.body) {
             firstSignature = candidate;
@@ -463,9 +463,9 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
     }
 
     function emptyLineExistsBeforeNode(node: Node): boolean {
-      let nonCodeLength = node.getStart() - node.getFullStart();
+      const nonCodeLength = node.getStart() - node.getFullStart();
 
-      let nonCode = node.getFullText().slice(0, nonCodeLength);
+      const nonCode = node.getFullText().slice(0, nonCodeLength);
 
       if (REGEX_EMPTY_LINE_IN_NON_CODE.test(nonCode)) {
         return true;
