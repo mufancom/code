@@ -1,4 +1,4 @@
-let plugins = [
+const plugins = [
   '@mufan/eslint-plugin',
   '@typescript-eslint',
   'import',
@@ -317,7 +317,7 @@ export const defaultConfig = {
     'no-template-curly-in-string': 'error',
     'no-ternary': 'off',
     'no-this-before-super': 'off',
-    'no-throw-literal': 'error',
+    'no-throw-literal': 'off',
     'no-trailing-spaces': 'off',
     'no-undef': 'off',
     'no-undef-init': 'error',
