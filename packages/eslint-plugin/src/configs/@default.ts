@@ -460,6 +460,7 @@ export const defaultConfig = {
             types: {
               '{}': false,
               object: false,
+              Function: false,
               Object: {
                 message:
                   'Avoid using the `Object` type. Did you mean `object`?',
