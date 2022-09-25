@@ -519,17 +519,7 @@ export const defaultConfig = {
             ],
           },
         ],
-        '@typescript-eslint/naming-convention': [
-          'error',
-          {
-            selector: 'class',
-            format: ['PascalCase'],
-          },
-          {
-            selector: 'interface',
-            format: ['PascalCase'],
-          },
-        ],
+        '@typescript-eslint/naming-convention': 'off',
         '@typescript-eslint/no-array-constructor': 'off',
         '@typescript-eslint/no-empty-function': 'off',
         '@typescript-eslint/no-empty-interface': 'off',
