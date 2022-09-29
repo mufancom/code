@@ -1,6 +1,6 @@
 {
   "name": "@mufan/eslint-plugin",
-  "version": "0.1.74",
+  "version": "0.1.75",
   "publishConfig": {
     "access": "public"
   },
