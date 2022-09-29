@@ -1,6 +1,7 @@
 import * as Path from 'path';
 
 import type {TSESTree} from '@typescript-eslint/utils';
+import {format} from 'module-lens';
 
 import {
   ImportKind,
@@ -18,12 +19,7 @@ const messages = {
     'Can not import this module that have index file in the directory where this module is located.',
 };
 
-type Options = [
-  {
-    baseUrl?: string;
-    tsConfigSearchName?: string;
-  },
-];
+type Options = [{}];
 
 type MessageId = keyof typeof messages;
 
@@ -50,6 +46,7 @@ export const importPathShallowestRule = createRule<Options, MessageId>({
       },
     ],
     type: 'suggestion',
+    fixable: 'code',
   },
   defaultOptions: [{}],
 
@@ -70,35 +67,69 @@ export const importPathShallowestRule = createRule<Options, MessageId>({
 
       private validate(expression: TSESTree.LiteralExpression): void {
         const helper = this.moduleSpecifierHelper;
-        const specifier = getModuleSpecifier(context.getSourceCode(), expression);
+        const specifier = getModuleSpecifier(
+          context.getSourceCode(),
+          expression,
+        );
 
-        const {category, path} = helper.resolveWithCategory(specifier);
+        const {category, path: specifierPath} =
+          helper.resolveWithCategory(specifier);
 
         const sourceFileName = context.getFilename();
 
         if (
-          !path ||
+          !specifierPath ||
           category === 'built-in' ||
-          category === 'node-modules' ||
-          // '../..', '../../foo'
-          isSubPathOf(sourceFileName, Path.dirname(path)) ||
-          // './foo'
-          Path.relative(path, Path.dirname(sourceFileName)) === ''
+          category === 'node-modules'
         ) {
           return;
         }
 
-        const parentDirName = Path.dirname(path);
+        let expectedSpecifierPath = specifierPath;
 
-        if (!hasIndexFile(parentDirName)) {
+        if (isIndexFile(expectedSpecifierPath)) {
+          expectedSpecifierPath = Path.dirname(expectedSpecifierPath);
+        }
+
+        while (true) {
+          const parentDirName = Path.dirname(expectedSpecifierPath);
+
+          if (
+            isSubPathOf(sourceFileName, parentDirName) ||
+            !hasIndexFile(parentDirName)
+          ) {
+            break;
+          }
+
+          expectedSpecifierPath = parentDirName;
+        }
+
+        if (expectedSpecifierPath === specifierPath) {
           return;
         }
+
+        const expectedSpecifier = format(
+          Path.posix.normalize(
+            Path.relative(Path.dirname(sourceFileName), expectedSpecifierPath),
+          ),
+          true,
+        );
 
         context.report({
           node: expression.parent!,
           messageId: 'canNotImportDirectoryModules',
+          fix: fixer => fixer.replaceText(expression, `'${expectedSpecifier}'`),
         });
       }
+    }
+
+    function isIndexFile(path: string): boolean {
+      const fileName = Path.basename(path);
+
+      return (
+        fileName === 'index' ||
+        MODULE_EXTENSIONS.some(extension => fileName === `index${extension}`)
+      );
     }
 
     function hasIndexFile(dirName: string): boolean {

@@ -23,56 +23,26 @@ ruleTester.run(RULE_NAME, rules[RULE_NAME], {
   valid: [
     {
       code: getTestFileContent(TEST_DIR_PATH, 'foo/test.ts.lint'),
-      options: [
-        {
-          baseUrl: 'core',
-        },
-      ],
       filename: getTestFileFullPath(TEST_DIR_PATH, 'foo/test.ts.lint'),
     },
     {
       code: getTestFileContent(TEST_DIR_PATH, 'bar/test.ts.lint'),
-      options: [
-        {
-          baseUrl: 'core',
-        },
-      ],
       filename: getTestFileFullPath(TEST_DIR_PATH, 'bar/test.ts.lint'),
     },
     {
       code: getTestFileContent(TEST_DIR_PATH, 'bar/he/c.ts.lint'),
-      options: [
-        {
-          baseUrl: 'core',
-        },
-      ],
       filename: getTestFileFullPath(TEST_DIR_PATH, 'bar/he/c.ts.lint'),
     },
     {
       code: getTestFileContent(TEST_DIR_PATH, 'core/test.ts.lint'),
-      options: [
-        {
-          baseUrl: 'core',
-        },
-      ],
       filename: getTestFileFullPath(TEST_DIR_PATH, 'core/test.ts.lint'),
     },
     {
       code: getTestFileContent(TEST_DIR_PATH, 'core/b/test.ts.lint'),
-      options: [
-        {
-          baseUrl: 'core',
-        },
-      ],
       filename: getTestFileFullPath(TEST_DIR_PATH, 'core/b/test.ts.lint'),
     },
     {
       code: getTestFileContent(TEST_DIR_PATH, 'core/b/c/test.ts.lint'),
-      options: [
-        {
-          baseUrl: 'core',
-        },
-      ],
       filename: getTestFileFullPath(TEST_DIR_PATH, 'core/b/c/test.ts.lint'),
     },
   ],
@@ -80,16 +50,11 @@ ruleTester.run(RULE_NAME, rules[RULE_NAME], {
     {
       code: getTestFileContent(TEST_DIR_PATH, 'test.ts.lint'),
       filename: getTestFileFullPath(TEST_DIR_PATH, 'test.ts.lint'),
-      options: [
-        {
-          baseUrl: 'core',
-        },
-      ],
+      output: getTestFileContent(TEST_DIR_PATH, 'test.ts.fix'),
       errors: [
         {messageId: 'canNotImportDirectoryModules', line: 1},
         {messageId: 'canNotImportDirectoryModules', line: 3},
         {messageId: 'canNotImportDirectoryModules', line: 5},
-        {messageId: 'canNotImportDirectoryModules', line: 9},
       ],
     },
   ],

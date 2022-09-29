@@ -1,0 +1,9 @@
+import * as foo from './foo'
+
+import * as foo from './foo'
+
+import * as b from './foo'
+
+import * as foo from './foo'
+
+import * as parse from 'parse'
