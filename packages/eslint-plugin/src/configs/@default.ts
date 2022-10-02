@@ -542,8 +542,8 @@ export const defaultConfig = {
         '@typescript-eslint/no-unused-vars': [
           'error',
           {
-            varsIgnorePattern: '^_([^_]|$)',
-            argsIgnorePattern: '^_([^_]|$)',
+            varsIgnorePattern: '^_',
+            argsIgnorePattern: '^_',
           },
         ],
         '@typescript-eslint/no-use-before-define': 'off',
