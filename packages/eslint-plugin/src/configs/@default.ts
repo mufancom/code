@@ -386,6 +386,7 @@ export const defaultConfig = {
     'react-hooks/exhaustive-deps': 'error',
     'react-hooks/rules-of-hooks': 'error',
     'react/jsx-uses-vars': 'error',
+    'react/jsx-curly-brace-presence': ['error', 'never'],
     'react/self-closing-comp': [
       'error',
       {
