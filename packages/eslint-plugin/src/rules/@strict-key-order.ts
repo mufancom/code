@@ -38,7 +38,7 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
     const typeChecker = parserServices.program.getTypeChecker();
 
     function mapIteratorToArray(
-      iterator: TypeScript.Iterator<TypeScript.__String>,
+      iterator: IterableIterator<TypeScript.__String>,
     ): string[] {
       const result: string[] = [];
 

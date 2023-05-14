@@ -5,6 +5,6 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   rules: {
-    "@mufan/import-type-unification": ["error"]
-  }
+    '@mufan/import-type-unification': ['error'],
+  },
 };

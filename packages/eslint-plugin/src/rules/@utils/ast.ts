@@ -1,8 +1,6 @@
-import type { TSESLint, TSESTree} from '@typescript-eslint/utils';
+import type {TSESLint, TSESTree} from '@typescript-eslint/utils';
 import {AST_NODE_TYPES} from '@typescript-eslint/utils';
-import type {
-  FunctionLikeDeclaration,
-  Node} from 'typescript';
+import type {FunctionLikeDeclaration, Node} from 'typescript';
 import {
   isArrowFunction,
   isConstructorDeclaration,

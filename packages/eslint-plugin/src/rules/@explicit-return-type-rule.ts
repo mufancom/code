@@ -174,7 +174,10 @@ export const explicitReturnTypeRule = createRule<Options, MessageId>({
           return undefined;
         }
 
-        const closeParenToken = getChildOfKind(node, SyntaxKind.CloseParenToken);
+        const closeParenToken = getChildOfKind(
+          node,
+          SyntaxKind.CloseParenToken,
+        );
 
         if (!closeParenToken) {
           return undefined;

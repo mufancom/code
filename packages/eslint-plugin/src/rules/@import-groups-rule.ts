@@ -235,7 +235,10 @@ export const importGroupsRule = createRule<Options, MessageId>({
           node = node.parent;
         }
 
-        const specifier = getModuleSpecifier(context.getSourceCode(), expression);
+        const specifier = getModuleSpecifier(
+          context.getSourceCode(),
+          expression,
+        );
 
         const sourceFileName = context.getFilename();
 

@@ -50,7 +50,10 @@ export const importPathBeSmartRule = createRule<Options, MessageId>({
         expression: TSESTree.LiteralExpression,
         sourceDirName: string,
       ): void {
-        const specifier = getModuleSpecifier(context.getSourceCode(), expression);
+        const specifier = getModuleSpecifier(
+          context.getSourceCode(),
+          expression,
+        );
 
         const dotSlash = specifier.startsWith('./');
 

@@ -2,13 +2,8 @@ import * as Path from 'path';
 
 import type {TSESLint, TSESTree} from '@typescript-eslint/utils';
 import _ from 'lodash';
-import type {
-  ResolveWithCategoryResult} from 'module-lens';
-import {
-  build,
-  resolve,
-  resolveWithCategory,
-} from 'module-lens';
+import type {ResolveWithCategoryResult} from 'module-lens';
+import {build, resolve, resolveWithCategory} from 'module-lens';
 
 import {isSubPathOf, searchUpperDir} from './path';
 

@@ -417,7 +417,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
     const newModulePaths = [];
 
-    for (const modulePath of filePathToModulePaths[filePath]?.modulePaths || []) {
+    for (const modulePath of filePathToModulePaths[filePath]?.modulePaths ||
+      []) {
       const reportInfo = modulePathToReportInfoDict[modulePath];
 
       if (reportInfo?.importIdentifyInfos) {
@@ -445,7 +446,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       context.parserServices.esTreeNodeToTSNodeMap
     ) {
       const parserServices = context.parserServices as RequiredParserServices;
-      const baseUrlDirName = parserServices.program.getCompilerOptions().baseUrl;
+      const baseUrlDirName =
+        parserServices.program.getCompilerOptions().baseUrl;
 
       walkNode(
         context.getSourceCode().ast,
@@ -742,25 +744,28 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       reportMessageId: 'importTypeNotUnified' | 'notMatchConfiguration',
       moduleSpecifier: string,
     ): boolean {
-      const importIdentifyInfos = importTypeToImportIdentifyInfosDict[importType];
+      const importIdentifyInfos =
+        importTypeToImportIdentifyInfosDict[importType];
 
       if (importIdentifyInfos.length === 1) {
         return false;
       }
 
-      const importIdentifyInfo = importIdentifyInfos.find(importIdentifyInfo => {
-        if (importIdentifyInfo.identifier!.name !== identifier.name) {
-          const stat = gentleStat(importIdentifyInfo.filePath);
+      const importIdentifyInfo = importIdentifyInfos.find(
+        importIdentifyInfo => {
+          if (importIdentifyInfo.identifier!.name !== identifier.name) {
+            const stat = gentleStat(importIdentifyInfo.filePath);
 
-          if (!stat) {
-            deleteImportIdentityInfo(importIdentifyInfo.filePath);
+            if (!stat) {
+              deleteImportIdentityInfo(importIdentifyInfo.filePath);
+            }
+
+            return stat ? true : false;
           }
 
-          return stat ? true : false;
-        }
-
-        return false;
-      })!;
+          return false;
+        },
+      )!;
 
       if (!importIdentifyInfo) {
         return false;
@@ -942,7 +947,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       );
 
       const groups = _.groupBy(reportInfo.importIdentifyInfos, 'importType');
-      const importTypeToImportIdentifyInfosDict: Dict<ImportIdentifyInfo[]> = {};
+      const importTypeToImportIdentifyInfosDict: Dict<ImportIdentifyInfo[]> =
+        {};
       const importTypes = Object.keys(groups).filter(
         importType =>
           importType !== 'named' &&
@@ -1157,7 +1163,8 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
 
           // Prefer quick config
           if (quickConfig) {
-            const {defaultImportNamingType, namedImportNamingType} = quickConfig;
+            const {defaultImportNamingType, namedImportNamingType} =
+              quickConfig;
 
             switch (importType) {
               case 'default':

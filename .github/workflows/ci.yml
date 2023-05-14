@@ -19,15 +19,8 @@ on:
 
 jobs:
   test:
-    strategy:
-      matrix:
-        node: [14, 16]
-    runs-on: ubuntu-18.04
+    runs-on: node:18
     steps:
-      - uses: actions/checkout@v2
-      - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node }}
+      - uses: actions/checkout@v3
       - run: yarn install
       - run: yarn test

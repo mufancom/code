@@ -105,7 +105,10 @@ export const importPathStrictHierarchyRule = createRule<Options, MessageId>({
       ): void {
         const helper = this.moduleSpecifierHelper;
 
-        const specifier = getModuleSpecifier(context.getSourceCode(), expression);
+        const specifier = getModuleSpecifier(
+          context.getSourceCode(),
+          expression,
+        );
         const {path: specifierPath, category} =
           helper.resolveWithCategory(specifier);
 

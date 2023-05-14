@@ -102,7 +102,10 @@ export const importPathBaseUrlRule = createRule<Options, MessageId>({
 
       if (firstSegmentOfRelativeSourcePath === firstSegmentOfSpecifierPath) {
         if (!relative) {
-          const relativeSpecifier = `'${helper.build(fullSpecifierPath, false)}'`;
+          const relativeSpecifier = `'${helper.build(
+            fullSpecifierPath,
+            false,
+          )}'`;
 
           context.report({
             node: expression,
