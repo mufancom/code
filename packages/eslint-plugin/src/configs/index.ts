@@ -1,8 +1,13 @@
-import {defaultConfig, defaultJavaScriptConfig} from './@default';
-import {overrideDevConfig} from './@override-dev';
+/* eslint-disable @mufan/explicit-return-type */
 
 export const configs = {
-  default: defaultConfig,
-  js: defaultJavaScriptConfig,
-  'override-dev': overrideDevConfig,
+  get js() {
+    return require('./@js').default;
+  },
+  get default() {
+    return require('./@default').default;
+  },
+  get 'override-dev'() {
+    return require('./@override-dev').default;
+  },
 };
