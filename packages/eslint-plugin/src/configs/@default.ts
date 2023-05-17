@@ -102,6 +102,9 @@ export default {
     {
       files: ['*.ts', '*.tsx'],
       rules: {
+        'no-unused-expressions': 'off',
+        'no-unused-labels': 'off',
+        'no-unused-vars': 'off',
         '@mufan/explicit-return-type': 'error',
         '@mufan/import-path-base-url': 'off',
         '@mufan/import-type-unification': 'error',
