@@ -170,7 +170,6 @@ export default {
           'error',
           {
             default: [
-              'instance-field',
               'public-constructor',
               'protected-constructor',
               'private-constructor',
