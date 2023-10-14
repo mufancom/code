@@ -8,9 +8,6 @@ importers:
 
   .:
     devDependencies:
-      '@mufan/code':
-        specifier: workspace:*
-        version: link:packages/code
       '@mufan/eslint-plugin':
         specifier: workspace:*
         version: link:packages/eslint-plugin
@@ -29,8 +26,6 @@ importers:
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
-
-  packages/code: {}
 
   packages/eslint-plugin:
     dependencies:
