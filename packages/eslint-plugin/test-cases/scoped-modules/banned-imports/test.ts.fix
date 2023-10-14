@@ -1,0 +1,4 @@
+import '../banned-exports/@bar/index.js';
+import '../banned-exports/@foo.js';
+import './@bar/index.js';
+import './@foo.js';

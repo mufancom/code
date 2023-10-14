@@ -23,6 +23,6 @@
     "x-value": "^0.1.16"
   },
   "devDependencies": {
-    "@types/node": "^20.8.6"
+    "ts-jest-resolver": "^2.0.1"
   }
 }

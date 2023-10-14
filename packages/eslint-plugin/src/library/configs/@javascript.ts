@@ -27,5 +27,6 @@ export default {
       },
     ],
     'no-unused-vars': ['error', {varsIgnorePattern: '^_(?!_)'}],
+    'prefer-template': 'error',
   },
 } satisfies Linter.Config;

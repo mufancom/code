@@ -1,0 +1,5 @@
+export * from './@bar/index.js';
+export * from './@foo.js';
+export * from './@bar/@foo.js';
+export * from './@bar/test.js';
+export * from './@bar/test/@foo.js';

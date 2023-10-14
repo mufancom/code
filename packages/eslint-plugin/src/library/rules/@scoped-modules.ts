@@ -304,7 +304,7 @@ export default {
         context.report({
           node: context.sourceCode.ast,
           messageId: 'missingExports',
-          fix: buildAddMissingExportsFixer(expectedExportSpecifiers),
+          fix: buildAddMissingExportsFixer(missingExportSpecifiers),
         });
       }
     }
@@ -315,8 +315,10 @@ export default {
       return fixer =>
         fixer.replaceTextRange(
           [0, context.sourceCode.getText().length],
-          `${specifiers
-            .map(value => `export * from '${value}';`)
+          `${[
+            context.getSourceCode().getText().trimEnd(),
+            ...specifiers.map(value => `export * from '${value}';`),
+          ]
             .filter(text => !!text)
             .join('\n')}\n`,
         );

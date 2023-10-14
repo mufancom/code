@@ -1,0 +1,4 @@
+import * as ExportNamespace from './namespace.js';
+import * as Foo from './@foo.js';
+
+export {ExportNamespace};

@@ -3,7 +3,8 @@
   "ignorePatterns": [
     "node_modules/",
     "/packages/eslint-plugin/src/",
-    "/packages/eslint-plugin/bld/"
+    "/packages/eslint-plugin/bld/",
+    "/packages/eslint-plugin/test-cases/"
   ],
   "extends": ["plugin:@mufan/javascript"],
   "overrides": [
