@@ -1,5 +1,7 @@
 import type {Linter} from 'eslint';
 
+import {NO_UNUSED_VARS_IGNORE_PATTERN} from './@common.js';
+
 export default {
   extends: ['eslint:recommended', 'plugin:import/recommended'],
   plugins: ['@mufan'],
@@ -26,7 +28,10 @@ export default {
         'newlines-between': 'always',
       },
     ],
-    'no-unused-vars': ['error', {varsIgnorePattern: '^_(?!_)'}],
+    'no-unused-vars': [
+      'error',
+      {varsIgnorePattern: NO_UNUSED_VARS_IGNORE_PATTERN},
+    ],
     'prefer-template': 'error',
   },
 } satisfies Linter.Config;
