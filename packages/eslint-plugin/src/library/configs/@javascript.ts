@@ -1,8 +1,10 @@
 import type {Linter} from 'eslint';
 
-export const javascript: Linter.Config = {
+export default {
   extends: ['eslint:recommended', 'plugin:import/recommended'],
+  plugins: ['@mufan'],
   rules: {
+    '@mufan/scoped-modules': 'error',
     'import/no-cycle': 'error',
     'import/no-extraneous-dependencies': [
       'error',
@@ -24,5 +26,6 @@ export const javascript: Linter.Config = {
         'newlines-between': 'always',
       },
     ],
+    'no-unused-vars': ['error', {varsIgnorePattern: '^_(?!_)'}],
   },
-};
+} satisfies Linter.Config;

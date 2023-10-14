@@ -1,6 +1,6 @@
 import type {Linter} from 'eslint';
 
-export const typescript: Linter.Config = {
+export default {
   extends: [
     'plugin:@mufan/javascript',
     'plugin:@typescript-eslint/recommended',
@@ -18,5 +18,9 @@ export const typescript: Linter.Config = {
       'error',
       {allowExpressions: true},
     ],
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {varsIgnorePattern: '^_(?!_)'},
+    ],
   },
-};
+} satisfies Linter.Config;
