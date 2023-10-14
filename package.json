@@ -9,11 +9,9 @@
     "lint": "eslint --no-error-on-unmatched-pattern . && run-in-every eslint-project --parallel --echo -- eslint --no-error-on-unmatched-pattern .",
     "lint-prettier": "prettier --check .",
     "test": "pnpm lint-prettier && pnpm build && pnpm lint",
-    "code": "pnpm --filter @mufan/code",
     "eslint-plugin": "pnpm --filter @mufan/eslint-plugin"
   },
   "devDependencies": {
-    "@mufan/code": "workspace:*",
     "@mufan/eslint-plugin": "workspace:*",
     "eslint": "^8.51.0",
     "prettier": "^3.0.3",

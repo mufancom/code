@@ -9,10 +9,6 @@
     "defaultBranch": "master",
     "packages": [
       {
-        "name": "@mufan/code",
-        "type": "module"
-      },
-      {
         "name": "@mufan/eslint-plugin",
         "type": "module",
         "projects": [
