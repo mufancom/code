@@ -1,0 +1,20 @@
+{
+  "root": true,
+  "ignorePatterns": [
+    "node_modules/",
+    "/packages/eslint-plugin/src/",
+    "/packages/eslint-plugin/bld/"
+  ],
+  "extends": ["plugin:@mufan/js"],
+  "overrides": [
+    {
+      "files": "**/*.{js,jsx}"
+    },
+    {
+      "files": "**/*.cjs",
+      "parserOptions": {
+        "sourceType": "script"
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "references": [
+    {
+      "path": "packages/eslint-plugin/src/library"
+    },
+    {
+      "path": "packages/eslint-plugin/src/test"
+    }
+  ],
+  "files": []
+}
