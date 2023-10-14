@@ -3,6 +3,7 @@
   "private": true,
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "type": "module",
   "scripts": {
     "3": "pnpm install && pnpm dedupe && pnpm install",
     "build": "rimraf packages/eslint-plugin/bld && tsc --build",

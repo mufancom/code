@@ -7,10 +7,11 @@
     "author": "Chengdu Mufan Technology Co., Ltd.",
     "packageManager": "pnpm",
     "defaultBranch": "master",
+    "type": "module",
     "packages": [
       {
         "name": "@mufan/eslint-plugin",
-        "type": "module",
+        "type": "commonjs",
         "projects": [
           {
             "name": "library"
