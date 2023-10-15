@@ -7,6 +7,13 @@ export default {
   plugins: [VSCODE && 'only-warn', '@mufan'].filter(
     (name): name is string => typeof name === 'string',
   ),
+  env: {
+    node: true,
+    es6: true,
+  },
+  parserOptions: {
+    ecmaVersion: 'latest',
+  },
   rules: {
     '@mufan/scoped-modules': 'error',
     'import/no-cycle': 'error',
