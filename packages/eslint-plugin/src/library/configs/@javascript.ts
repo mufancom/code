@@ -24,6 +24,7 @@ export default {
         optionalDependencies: false,
       },
     ],
+    'import/no-named-as-default': 'off',
     'import/no-relative-packages': 'error',
     'import/no-self-import': 'error',
     'import/no-useless-path-segments': 'error',
