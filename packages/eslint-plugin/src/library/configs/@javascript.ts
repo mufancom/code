@@ -27,6 +27,8 @@ export default {
     'import/no-named-as-default': 'off',
     'import/no-relative-packages': 'error',
     'import/no-self-import': 'error',
+    // https://github.com/import-js/eslint-plugin-import/issues/1810
+    'import/no-unresolved': 'off',
     'import/no-useless-path-segments': 'error',
     'import/order': [
       'error',
