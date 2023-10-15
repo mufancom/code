@@ -19,6 +19,7 @@
     "@typescript-eslint/utils": "^6.7.5",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-only-warn": "^1.1.0",
     "tslib": "^2.6.2",
     "x-value": "^0.1.16"
   },

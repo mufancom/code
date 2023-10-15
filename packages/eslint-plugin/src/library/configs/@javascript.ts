@@ -1,10 +1,12 @@
 import type {Linter} from 'eslint';
 
-import {NO_UNUSED_VARS_IGNORE_PATTERN} from './@common.js';
+import {NO_UNUSED_VARS_OPTIONS, VSCODE} from './@common.js';
 
 export default {
   extends: ['eslint:recommended', 'plugin:import/recommended'],
-  plugins: ['@mufan'],
+  plugins: [VSCODE && 'only-warn', '@mufan'].filter(
+    (name): name is string => typeof name === 'string',
+  ),
   rules: {
     '@mufan/scoped-modules': 'error',
     'import/no-cycle': 'error',
@@ -28,10 +30,8 @@ export default {
         'newlines-between': 'always',
       },
     ],
-    'no-unused-vars': [
-      'error',
-      {varsIgnorePattern: NO_UNUSED_VARS_IGNORE_PATTERN},
-    ],
+    'no-unused-vars': ['error', NO_UNUSED_VARS_OPTIONS],
+    'prefer-const': ['error', {destructuring: 'all'}],
     'prefer-template': 'error',
   },
 } satisfies Linter.Config;
