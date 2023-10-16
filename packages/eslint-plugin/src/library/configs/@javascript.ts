@@ -16,6 +16,7 @@ export default {
   },
   rules: {
     '@mufan/scoped-modules': 'error',
+    '@mufan/import-shallowest': 'error',
     'import/no-cycle': 'error',
     'import/no-extraneous-dependencies': [
       'error',
@@ -38,6 +39,12 @@ export default {
           orderImportKind: 'asc',
         },
         'newlines-between': 'always',
+      },
+    ],
+    'no-console': [
+      'error',
+      {
+        allow: ['error', 'warn', 'info', 'debug', 'assert'],
       },
     ],
     'no-unused-vars': ['error', NO_UNUSED_VARS_OPTIONS],
