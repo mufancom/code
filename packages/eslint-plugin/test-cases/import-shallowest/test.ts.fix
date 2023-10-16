@@ -1,0 +1,13 @@
+import * as foo from './foo/index.js'
+
+import * as foo from './foo/index.js'
+
+import * as b from './foo/index.js'
+
+import * as foo from './foo/index.js'
+
+import * as foo from './foo/index.js'
+
+import * as foo from './foo/b/b.js'
+
+import * as parse from 'parse'

@@ -1,7 +1,17 @@
 import {existsSync, readFileSync} from 'fs';
 import {join} from 'path';
 
-import type {TSESLint} from '@typescript-eslint/utils';
+import {TSESLint} from '@typescript-eslint/utils';
+
+export function createTypeUnawareTester(): TSESLint.RuleTester {
+  return new TSESLint.RuleTester({
+    parser: require.resolve('@typescript-eslint/parser'),
+    parserOptions: {
+      ecmaVersion: 2018,
+      sourceType: 'module',
+    },
+  });
+}
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function createTestCaseBuilder<TRule extends {meta: {messages: object}}>(
@@ -13,23 +23,18 @@ export function createTestCaseBuilder<TRule extends {meta: {messages: object}}>(
 
   return createTestCase;
 
+  function createTestCase(fileName: string): TSESLint.ValidTestCase<unknown[]>;
   function createTestCase(
-    name: string,
-    fileName: string,
-  ): TSESLint.ValidTestCase<unknown[]>;
-  function createTestCase(
-    name: string,
     fileName: string,
     errors: TSESLint.TestCaseError<MessageId>[],
   ): TSESLint.InvalidTestCase<MessageId, unknown[]>;
   function createTestCase(
-    name: string,
     fileName: string,
     errors?: TSESLint.TestCaseError<MessageId>[],
   ):
     | TSESLint.ValidTestCase<unknown[]>
     | TSESLint.InvalidTestCase<MessageId, unknown[]> {
-    const path = join(dir, name, fileName);
+    const path = join(dir, fileName);
 
     const lintFilePath = `${path}.lint`;
 
@@ -46,7 +51,7 @@ export function createTestCaseBuilder<TRule extends {meta: {messages: object}}>(
         : undefined;
 
       return {
-        name: name,
+        name: fileName,
         filename: path,
         code,
         errors,
@@ -54,7 +59,7 @@ export function createTestCaseBuilder<TRule extends {meta: {messages: object}}>(
       };
     } else {
       return {
-        name: name,
+        name: fileName,
         filename: path,
         code,
       };

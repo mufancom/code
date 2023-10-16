@@ -9,7 +9,7 @@
     "build": "rimraf packages/eslint-plugin/bld && tsc --build",
     "lint": "eslint --no-error-on-unmatched-pattern . && run-in-every eslint-project --parallel --echo -- eslint --no-error-on-unmatched-pattern .",
     "lint-prettier": "prettier --check .",
-    "test": "pnpm lint-prettier && pnpm build && pnpm lint",
+    "test": "pnpm lint-prettier && pnpm build && pnpm lint && pnpm jest",
     "eslint-plugin": "pnpm --filter @mufan/eslint-plugin"
   },
   "devDependencies": {

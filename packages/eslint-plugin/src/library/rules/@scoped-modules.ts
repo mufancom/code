@@ -17,7 +17,7 @@ import {
   getSourceCodeFullStart,
   hasKnownModuleFileExtension,
   removeModuleFileExtension,
-} from './@utils.js';
+} from './@utils/index.js';
 
 const INDEX_FILE_REGEX = /(?:^|[\\/])index\.(?:js|jsx|ts|tsx|d\.ts)$/i;
 const NAMESPACE_FILE_REGEX = /(?:^|[\\/])namespace\.(?:js|jsx|ts|tsx|d\.ts)$/i;
@@ -38,6 +38,8 @@ const messages = {
   bannedExportWhenNamespaceExists:
     'This module can not be exported since namespace file exists',
 };
+
+type MessageId = keyof typeof messages;
 
 const Options = x.tuple([x.object({})]);
 
@@ -386,4 +388,4 @@ export default {
 
     return {};
   },
-} satisfies ESLintUtils.RuleWithMeta<Options, keyof typeof messages>;
+} satisfies ESLintUtils.RuleWithMeta<Options, MessageId>;
