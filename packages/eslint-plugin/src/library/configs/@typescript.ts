@@ -20,6 +20,7 @@ export default {
         extendDefaults: true,
         types: {
           Function: false,
+          '{}': false,
         },
       },
     ],
