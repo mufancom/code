@@ -66,23 +66,23 @@ export default {
 
     type ModuleStatementType = ModuleStatementInfo['type'];
 
-    interface ImportStatementInfo {
+    type ImportStatementInfo = {
       type: 'import';
       statement: ModuleStatement;
       specifier: string;
-    }
+    };
 
-    interface ExportStatementInfo {
+    type ExportStatementInfo = {
       type: 'export';
       statement: ModuleStatement;
       specifier: string;
-    }
+    };
 
-    interface ExportAsStatementInfo {
+    type ExportAsStatementInfo = {
       type: 'export-as';
       statement: ModuleStatement;
       specifier: string;
-    }
+    };
 
     function validateImportOrExport({
       type,
