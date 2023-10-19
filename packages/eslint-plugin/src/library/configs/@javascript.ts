@@ -49,7 +49,6 @@ export default {
     ],
     'no-unused-vars': ['error', NO_UNUSED_VARS_OPTIONS],
     'no-useless-computed-key': 'error',
-    'no-useless-constructor': 'error',
     'no-useless-rename': 'error',
     'object-shorthand': 'error',
     'prefer-const': ['error', {destructuring: 'all'}],
