@@ -33,6 +33,7 @@ export default {
     ],
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-namespace': 'off',
+    '@typescript-eslint/no-unsafe-declaration-merging': 'off',
     '@typescript-eslint/no-unused-vars': ['error', NO_UNUSED_VARS_OPTIONS],
     '@typescript-eslint/no-var-requires': 'off',
     'import/export': 'off',
