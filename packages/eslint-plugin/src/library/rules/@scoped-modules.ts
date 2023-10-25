@@ -2,10 +2,10 @@ import * as FS from 'fs';
 import * as Path from 'path';
 
 import type {
+  ESLintUtils,
+  JSONSchema,
   TSESLint,
   TSESTree,
-  JSONSchema,
-  ESLintUtils,
 } from '@typescript-eslint/utils';
 import {AST_NODE_TYPES} from '@typescript-eslint/utils';
 import * as x from 'x-value';
