@@ -53,5 +53,6 @@ export default {
     'object-shorthand': 'error',
     'prefer-const': ['error', {destructuring: 'all'}],
     'prefer-template': 'error',
+    'sort-imports': ['error', {ignoreDeclarationSort: true}],
   },
 } satisfies Linter.Config;
