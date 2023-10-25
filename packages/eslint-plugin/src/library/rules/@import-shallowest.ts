@@ -117,8 +117,12 @@ export default {
 function guessModulePath(specifierPath: string): string {
   const stats = gentleStat(specifierPath);
 
-  if (stats && stats.isDirectory()) {
-    return Path.posix.join(specifierPath, 'index.js');
+  if (stats) {
+    if (stats.isDirectory()) {
+      return Path.posix.join(specifierPath, 'index.js');
+    } else {
+      return specifierPath;
+    }
   }
 
   const specifierPathWithoutExtension =

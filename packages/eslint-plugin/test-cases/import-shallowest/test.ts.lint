@@ -10,4 +10,6 @@ import * as foo from './foo'
 
 import * as foo from './foo/b/b'
 
+import './style.css'
+
 import * as parse from 'parse'
