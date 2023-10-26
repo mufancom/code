@@ -26,6 +26,7 @@ export default {
       },
     ],
     'import/no-named-as-default': 'off',
+    'import/no-named-as-default-member': 'off',
     'import/no-relative-packages': 'error',
     'import/no-self-import': 'error',
     // https://github.com/import-js/eslint-plugin-import/issues/1810
