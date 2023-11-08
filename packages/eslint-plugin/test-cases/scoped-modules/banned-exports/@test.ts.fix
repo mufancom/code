@@ -1,3 +1,0 @@
-export * from './@bar/index.js';
-export * from './@foo.js';
-export * from './@bar/test.js';

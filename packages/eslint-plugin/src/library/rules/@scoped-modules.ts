@@ -14,7 +14,6 @@ import {
   difference,
   getBaseNameWithoutExtension,
   getModuleSpecifier,
-  getSourceCodeFullStart,
   hasKnownModuleFileExtension,
   removeModuleFileExtension,
 } from './@utils/index.js';
@@ -54,32 +53,73 @@ export default {
   },
   defaultOptions: [{}],
   create(context) {
+    const infos: ModuleStatementInfo[] = [];
+
+    for (const statement of context.sourceCode.ast.body) {
+      let type: ModuleStatementType;
+
+      switch (statement.type) {
+        case AST_NODE_TYPES.ImportDeclaration:
+          type = 'import';
+          break;
+
+        case AST_NODE_TYPES.ExportNamedDeclaration:
+          type = 'export-named';
+          break;
+
+        case AST_NODE_TYPES.ExportAllDeclaration:
+          type = statement.exported ? 'export-as' : 'export-all';
+          break;
+
+        default:
+          continue;
+      }
+
+      const specifier =
+        statement.source && isStringLiteral(statement.source)
+          ? getModuleSpecifier(context.sourceCode, statement.source)
+          : undefined;
+
+      if (!specifier) {
+        continue;
+      }
+
+      infos.push({
+        type,
+        statement,
+        specifier,
+      } as ModuleStatementInfo);
+    }
+
+    const fileName = context.filename;
+
+    if (INDEX_FILE_REGEX.test(fileName)) {
+      validateIndexFile(infos);
+    } else {
+      for (const info of infos) {
+        validateImportOrExport(info);
+      }
+
+      if (NAMESPACE_FILE_REGEX.test(fileName)) {
+        validateNamespaceFile();
+      }
+    }
+
+    return {};
+
     type ModuleStatement =
       | TSESTree.ImportDeclaration
       | TSESTree.ExportNamedDeclaration
       | TSESTree.ExportAllDeclaration;
 
-    type ModuleStatementInfo =
-      | ImportStatementInfo
-      | ExportStatementInfo
-      | ExportAsStatementInfo;
+    type ModuleStatementType =
+      | 'import'
+      | 'export-named'
+      | 'export-all'
+      | 'export-as';
 
-    type ModuleStatementType = ModuleStatementInfo['type'];
-
-    type ImportStatementInfo = {
-      type: 'import';
-      statement: ModuleStatement;
-      specifier: string;
-    };
-
-    type ExportStatementInfo = {
-      type: 'export';
-      statement: ModuleStatement;
-      specifier: string;
-    };
-
-    type ExportAsStatementInfo = {
-      type: 'export-as';
+    type ModuleStatementInfo = {
+      type: ModuleStatementType;
       statement: ModuleStatement;
       specifier: string;
     };
@@ -112,23 +152,6 @@ export default {
         context.report({
           node: statement,
           messageId,
-          fix:
-            type === 'export'
-              ? fixer => {
-                  const tokenAfter =
-                    context.sourceCode.getTokenAfter(statement);
-
-                  return fixer.replaceTextRange(
-                    [
-                      statement.range[0],
-                      tokenAfter === null
-                        ? context.sourceCode.getText().length
-                        : tokenAfter.range[0],
-                    ],
-                    '',
-                  );
-                }
-              : undefined,
         });
       }
     }
@@ -162,9 +185,10 @@ export default {
            *  the namespace file.
            */
           if (
-            type === 'export' ||
-            ((type === 'import' || type === 'export-as') &&
-              specifier !== './namespace.js')
+            type === 'export-named' ||
+            type === 'export-all' ||
+            type === 'import' ||
+            (type === 'export-as' && specifier !== './namespace.js')
           ) {
             context.report({
               node: statement,
@@ -172,21 +196,12 @@ export default {
                 type === 'import'
                   ? 'bannedImportWhenNamespaceExists'
                   : 'bannedExportWhenNamespaceExists',
-              fix: fixer => {
-                return fixer.replaceTextRange(
-                  [
-                    getSourceCodeFullStart(context.sourceCode, statement),
-                    statement.range[1],
-                  ],
-                  '',
-                );
-              },
             });
           }
         }
 
         const importSpecifiers = infos
-          .filter(info => info.type === 'import' || info.type === 'export-as')
+          .filter(info => info.type === 'export-as')
           .map(info => info.specifier);
 
         const expectedImportSpecifiers = ['./namespace.js'];
@@ -237,7 +252,7 @@ export default {
 
     function validateFile(dirName: string, fileNames: string[]): void {
       const exportSpecifiers = infos
-        .filter(info => info.type === 'export')
+        .filter(info => info.type === 'export-all')
         .map(info => info.specifier);
 
       const expectedExportSpecifiers = fileNames
@@ -306,7 +321,7 @@ export default {
         context.report({
           node: context.sourceCode.ast,
           messageId: 'missingExports',
-          fix: buildAddMissingExportsFixer(missingExportSpecifiers),
+          fix: buildAddMissingExportsFixer(expectedExportSpecifiers),
         });
       }
     }
@@ -314,16 +329,23 @@ export default {
     function buildAddMissingExportsFixer(
       specifiers: string[],
     ): TSESLint.ReportFixFunction {
-      return fixer =>
-        fixer.replaceTextRange(
-          [0, context.sourceCode.getText().length],
-          `${[
-            context.getSourceCode().getText().trimEnd(),
-            ...specifiers.map(value => `export * from '${value}';`),
-          ]
-            .filter(text => !!text)
-            .join('\n')}\n`,
-        );
+      return fixer => {
+        const sourceCodeEnd = context.sourceCode.getText().length;
+
+        const replacement = specifiers
+          .map(value => `export * from '${value}';`)
+          .join('\n');
+
+        return infos.length > 0
+          ? fixer.replaceTextRange(
+              [
+                infos[0].statement.range[0],
+                infos[infos.length - 1].statement.range[1],
+              ],
+              replacement,
+            )
+          : fixer.insertTextAfterRange([0, sourceCodeEnd], `${replacement}\n`);
+      };
     }
 
     function isStringLiteral(node: TSESTree.Node): node is TSESTree.Literal {
@@ -333,59 +355,5 @@ export default {
         node.type === AST_NODE_TYPES.TemplateLiteral
       );
     }
-
-    const infos: ModuleStatementInfo[] = [];
-
-    for (const statement of context.sourceCode.ast.body) {
-      let type: ModuleStatementType;
-
-      switch (statement.type) {
-        case AST_NODE_TYPES.ImportDeclaration:
-          type = 'import';
-          break;
-
-        case AST_NODE_TYPES.ExportNamedDeclaration:
-          type = 'export';
-          break;
-
-        case AST_NODE_TYPES.ExportAllDeclaration:
-          type = statement.exported ? 'export-as' : 'export';
-          break;
-
-        default:
-          continue;
-      }
-
-      const specifier =
-        statement.source && isStringLiteral(statement.source)
-          ? getModuleSpecifier(context.sourceCode, statement.source)
-          : undefined;
-
-      if (!specifier) {
-        continue;
-      }
-
-      infos.push({
-        type,
-        statement,
-        specifier,
-      } as ModuleStatementInfo);
-    }
-
-    const fileName = context.filename;
-
-    if (INDEX_FILE_REGEX.test(fileName)) {
-      validateIndexFile(infos);
-    } else {
-      for (const info of infos) {
-        validateImportOrExport(info);
-      }
-
-      if (NAMESPACE_FILE_REGEX.test(fileName)) {
-        validateNamespaceFile();
-      }
-    }
-
-    return {};
   },
 } satisfies ESLintUtils.RuleWithMeta<Options, MessageId>;

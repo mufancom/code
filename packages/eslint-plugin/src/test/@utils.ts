@@ -48,7 +48,7 @@ export function createTestCaseBuilder<TRule extends {meta: {messages: object}}>(
 
       const output = existsSync(fixFilePath)
         ? readFileSync(fixFilePath, 'utf8')
-        : undefined;
+        : code;
 
       return {
         name: fileName,
