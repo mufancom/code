@@ -1,4 +1,4 @@
-/** @type {import('ts-jest').JestConfigWithTsJest} */
+/** @type {import('jest').Config} */
 export default {
-  projects: ['<rootDir>/packages/*'],
+  projects: ['packages/eslint-plugin'],
 };

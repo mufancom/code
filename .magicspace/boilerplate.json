@@ -7,6 +7,11 @@
     "author": "Chengdu Mufan Technology Co., Ltd.",
     "packageManager": "pnpm",
     "defaultBranch": "master",
+    "badges": {
+      "npm": true,
+      "license": true,
+      "discord": "https://discord.gg/vanVrDwSkS"
+    },
     "type": "module",
     "packages": [
       {
