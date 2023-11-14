@@ -48,6 +48,7 @@ export default {
         allow: ['error', 'warn', 'info', 'debug', 'assert'],
       },
     ],
+    'no-empty-pattern': 'off',
     'no-unused-vars': ['error', NO_UNUSED_VARS_OPTIONS],
     'no-useless-computed-key': 'error',
     'no-useless-rename': 'error',
