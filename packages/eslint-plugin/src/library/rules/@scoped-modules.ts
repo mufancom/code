@@ -211,7 +211,7 @@ export default {
           importSpecifiers,
         );
 
-        if (missingImportIds.length) {
+        if (missingImportIds.length > 0) {
           context.report({
             node: context.sourceCode.ast,
             messageId: 'missingImports',
@@ -251,11 +251,11 @@ export default {
     }
 
     function validateFile(dirName: string, fileNames: string[]): void {
-      const exportSpecifiers = infos
-        .filter(info => info.type === 'export-all')
-        .map(info => info.specifier);
+      const exportAllInfos = infos.filter(info => info.type === 'export-all');
 
-      const expectedExportSpecifiers = fileNames
+      const exportAllSpecifiers = exportAllInfos.map(info => info.specifier);
+
+      const expectedExportAllSpecifiers = fileNames
         .map((fileName): string | undefined => {
           if (fileName.startsWith('.')) {
             return undefined;
@@ -312,40 +312,43 @@ export default {
         })
         .filter((entryName): entryName is string => !!entryName);
 
-      const missingExportSpecifiers = difference(
-        expectedExportSpecifiers,
-        exportSpecifiers,
+      const missingSpecifiers = difference(
+        expectedExportAllSpecifiers,
+        exportAllSpecifiers,
       );
 
-      if (missingExportSpecifiers.length) {
+      if (missingSpecifiers.length > 0) {
         context.report({
           node: context.sourceCode.ast,
           messageId: 'missingExports',
-          fix: buildAddMissingExportsFixer(expectedExportSpecifiers),
+          fix: buildReplaceExportsFixer(expectedExportAllSpecifiers),
         });
       }
-    }
 
-    function buildAddMissingExportsFixer(
-      specifiers: string[],
-    ): TSESLint.ReportFixFunction {
-      return fixer => {
-        const sourceCodeEnd = context.sourceCode.getText().length;
+      function buildReplaceExportsFixer(
+        specifiers: string[],
+      ): TSESLint.ReportFixFunction {
+        return fixer => {
+          const sourceCodeEnd = context.sourceCode.getText().length;
 
-        const replacement = specifiers
-          .map(value => `export * from '${value}';`)
-          .join('\n');
+          const replacement = specifiers
+            .map(value => `export * from '${value}';`)
+            .join('\n');
 
-        return infos.length > 0
-          ? fixer.replaceTextRange(
-              [
-                infos[0].statement.range[0],
-                infos[infos.length - 1].statement.range[1],
-              ],
-              replacement,
-            )
-          : fixer.insertTextAfterRange([0, sourceCodeEnd], `${replacement}\n`);
-      };
+          return exportAllInfos.length > 0
+            ? fixer.replaceTextRange(
+                [
+                  exportAllInfos[0].statement.range[0],
+                  exportAllInfos[exportAllInfos.length - 1].statement.range[1],
+                ],
+                replacement,
+              )
+            : fixer.insertTextAfterRange(
+                [0, sourceCodeEnd],
+                `${replacement}\n`,
+              );
+        };
+      }
     }
 
     function isStringLiteral(node: TSESTree.Node): node is TSESTree.Literal {
