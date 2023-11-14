@@ -2,7 +2,7 @@ import {rules} from '../library/index.js';
 
 import {createTestCaseBuilder, createTypeUnawareTester} from './@utils.js';
 
-const RULE_NAME = 'import-shallowest';
+const RULE_NAME = 'import';
 
 const RULE = rules[RULE_NAME];
 

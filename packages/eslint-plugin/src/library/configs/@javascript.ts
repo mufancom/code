@@ -16,7 +16,7 @@ export default {
   },
   rules: {
     '@mufan/scoped-modules': 'error',
-    '@mufan/import-shallowest': 'error',
+    '@mufan/import': 'error',
     'import/no-cycle': 'error',
     'import/no-extraneous-dependencies': [
       'error',
