@@ -19,8 +19,7 @@ import {
 } from './@utils/index.js';
 
 const messages = {
-  canNotImportDirectoryModules:
-    'Can not import this module that have index file in the directory where this module is located.',
+  unexpectedImportSpecifier: 'Unexpected import specifier.',
 };
 
 type MessageId = keyof typeof messages;
@@ -56,6 +55,11 @@ export default {
 
     function validate(expression: TSESTree.LiteralExpression): void {
       const specifier = getModuleSpecifier(context.getSourceCode(), expression);
+
+      if (specifier.includes('?')) {
+        // Ignore specifier with query.
+        return;
+      }
 
       const {category, path: specifierPath} = resolveWithCategory(specifier, {
         sourceFileName,
@@ -107,7 +111,7 @@ export default {
 
       context.report({
         node: expression.parent!,
-        messageId: 'canNotImportDirectoryModules',
+        messageId: 'unexpectedImportSpecifier',
         fix: fixer => fixer.replaceText(expression, `'${expectedSpecifier}'`),
       });
     }

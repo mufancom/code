@@ -19,11 +19,11 @@ createTypeUnawareTester().run(RULE_NAME, RULE, {
   ],
   invalid: [
     builder('test.ts', [
-      {messageId: 'canNotImportDirectoryModules', line: 1},
-      {messageId: 'canNotImportDirectoryModules', line: 3},
-      {messageId: 'canNotImportDirectoryModules', line: 5},
-      {messageId: 'canNotImportDirectoryModules', line: 9},
-      {messageId: 'canNotImportDirectoryModules', line: 11},
+      {messageId: 'unexpectedImportSpecifier', line: 1},
+      {messageId: 'unexpectedImportSpecifier', line: 3},
+      {messageId: 'unexpectedImportSpecifier', line: 5},
+      {messageId: 'unexpectedImportSpecifier', line: 9},
+      {messageId: 'unexpectedImportSpecifier', line: 11},
     ]),
   ],
 });
