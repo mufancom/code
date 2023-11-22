@@ -32,6 +32,7 @@ export default {
       {allowExpressions: true},
     ],
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-this-alias': 'off',
     '@typescript-eslint/no-unsafe-declaration-merging': 'off',
