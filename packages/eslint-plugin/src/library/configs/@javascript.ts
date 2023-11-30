@@ -55,6 +55,7 @@ export default {
     'object-shorthand': 'error',
     'prefer-const': ['error', {destructuring: 'all'}],
     'prefer-template': 'error',
+    quotes: ['error', 'single', {avoidEscape: true}],
     'sort-imports': ['error', {ignoreDeclarationSort: true}],
   },
 } satisfies Linter.Config;

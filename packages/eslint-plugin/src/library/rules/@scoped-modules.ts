@@ -220,7 +220,7 @@ export default {
                 context.sourceCode.ast.range,
                 `${[
                   context.sourceCode.getText().trimEnd(),
-                  `export * as Namespace from './namespace.js';`,
+                  "export * as Namespace from './namespace.js';",
                 ]
                   .filter(text => !!text)
                   .join('\n')}\n`,
