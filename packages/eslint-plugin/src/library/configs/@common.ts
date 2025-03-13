@@ -6,5 +6,5 @@ export const NO_UNUSED_VARS_OPTIONS = {
 };
 
 export const VSCODE = require.main
-  ? /[\\/]\.vscode(?:-server)?[\\/]extensions[\\/]/.test(require.main.filename)
+  ? /[\\/]\.[^\\/]+[\\/]extensions[\\/]/.test(require.main.filename)
   : false;
