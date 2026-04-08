@@ -4,7 +4,7 @@ import {statSync} from 'fs';
 export function gentleStat(path: string): Stats | undefined {
   try {
     return statSync(path);
-  } catch (error) {
+  } catch {
     return undefined;
   }
 }

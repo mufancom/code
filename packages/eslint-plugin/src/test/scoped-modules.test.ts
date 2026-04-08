@@ -1,20 +1,16 @@
-import {createTestCaseBuilder, createTypeUnawareTester} from './@utils.js';
+import plugin from '../library/index.js';
 
-import {rules} from '@mufan/eslint-plugin';
+import {createTestCaseBuilder, createTypeUnawareTester} from './@utils.js';
 
 const RULE_NAME = 'scoped-modules';
 
-const RULE = rules[RULE_NAME];
+const RULE = plugin.rules[RULE_NAME];
 
 const builder = createTestCaseBuilder<typeof RULE>(RULE_NAME);
 
 createTypeUnawareTester().run(RULE_NAME, RULE, {
   valid: [builder('export-as-namespace/1/index.ts')],
   invalid: [
-    builder('banned-exports/@test.ts', [
-      {messageId: 'bannedExport', line: 3},
-      {messageId: 'bannedExport', line: 5},
-    ]),
     builder('banned-exports/@test.ts', [
       {messageId: 'bannedExport', line: 3},
       {messageId: 'bannedExport', line: 5},

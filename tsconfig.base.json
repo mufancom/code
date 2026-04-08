@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2018",
+    "target": "esnext",
 
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
 
-    "lib": ["ESNext"],
+    "lib": ["esnext"],
     "types": [],
 
     "importHelpers": true,

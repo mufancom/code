@@ -4,7 +4,43 @@
 
 # @mufan/eslint-plugin
 
-Just another awesome magic.
+Flat-config-first ESLint plugin and shared config set.
+
+## Usage
+
+```js
+import {defineConfig} from 'eslint/config';
+
+import mufan, {configs} from '@mufan/eslint-plugin';
+
+export default defineConfig([
+  {
+    files: ['**/*.{js,mjs,cjs}'],
+    plugins: {
+      '@mufan': mufan,
+    },
+    extends: [configs.javascript],
+  },
+  {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    plugins: {
+      '@mufan': mufan,
+    },
+    extends: [configs.typescript],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+      },
+    },
+  },
+]);
+```
+
+The plugin exports:
+
+- default export: plugin object
+- named export `configs`
+- named export `rules`
 
 ## License
 

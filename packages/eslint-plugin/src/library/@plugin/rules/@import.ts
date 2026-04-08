@@ -37,7 +37,7 @@ export default {
   },
   defaultOptions: [{}],
   create(context) {
-    const sourceFileName = context.getFilename();
+    const sourceFileName = context.filename;
 
     return {
       ImportDeclaration(node) {
@@ -54,7 +54,7 @@ export default {
     };
 
     function validate(expression: TSESTree.LiteralExpression): void {
-      const specifier = getModuleSpecifier(context.getSourceCode(), expression);
+      const specifier = getModuleSpecifier(context.sourceCode, expression);
 
       if (specifier.includes('?')) {
         // Ignore specifier with query.
@@ -77,7 +77,6 @@ export default {
 
       let currentPath = expectedSpecifierPath;
 
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         currentPath = Path.dirname(currentPath);
 

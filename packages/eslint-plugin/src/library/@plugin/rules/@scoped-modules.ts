@@ -163,7 +163,7 @@ export default {
 
       try {
         fileNames = FS.readdirSync(dirName);
-      } catch (error) {
+      } catch {
         console.error(
           `Index validation aborted due to failure of reading: ${dirName}`,
         );
@@ -240,7 +240,7 @@ export default {
 
       try {
         fileNames = FS.readdirSync(dirName);
-      } catch (error) {
+      } catch {
         console.error(
           `Index validation aborted due to failure of reading: ${dirName}`,
         );
@@ -266,7 +266,7 @@ export default {
 
           try {
             stats = FS.statSync(entryFullPath);
-          } catch (error) {
+          } catch {
             return undefined;
           }
 
@@ -287,7 +287,7 @@ export default {
 
             try {
               entryNamesInFolder = FS.readdirSync(entryFullPath);
-            } catch (error) {
+            } catch {
               return undefined;
             }
 

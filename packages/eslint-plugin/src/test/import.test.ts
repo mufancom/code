@@ -1,10 +1,10 @@
-import {rules} from '../library/index.js';
+import plugin from '../library/index.js';
 
 import {createTestCaseBuilder, createTypeUnawareTester} from './@utils.js';
 
 const RULE_NAME = 'import';
 
-const RULE = rules[RULE_NAME];
+const RULE = plugin.rules[RULE_NAME];
 
 const builder = createTestCaseBuilder<typeof RULE>(RULE_NAME);
 

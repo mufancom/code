@@ -1,23 +1,29 @@
 import {existsSync, readFileSync} from 'fs';
-import {join} from 'path';
+import {dirname, join} from 'path';
+import {fileURLToPath} from 'url';
 
+import parser from '@typescript-eslint/parser';
 import {TSESLint} from '@typescript-eslint/utils';
 
 export function createTypeUnawareTester(): TSESLint.RuleTester {
   return new TSESLint.RuleTester({
-    parser: require.resolve('@typescript-eslint/parser'),
-    parserOptions: {
-      ecmaVersion: 2018,
+    languageOptions: {
+      parser,
+      ecmaVersion: 'latest',
       sourceType: 'module',
     },
-  });
+  } as never);
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function createTestCaseBuilder<TRule extends {meta: {messages: object}}>(
   ruleName: string,
 ) {
-  const dir = join(__dirname, '../../test-cases', ruleName);
+  const dir = join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../../test-cases',
+    ruleName,
+  );
 
   type MessageId = Extract<keyof TRule['meta']['messages'], string>;
 
@@ -48,14 +54,14 @@ export function createTestCaseBuilder<TRule extends {meta: {messages: object}}>(
 
       const output = existsSync(fixFilePath)
         ? readFileSync(fixFilePath, 'utf8')
-        : code;
+        : null;
 
       return {
         name: fileName,
         filename: path,
         code,
         errors,
-        output,
+        output: output === code ? null : output,
       };
     } else {
       return {
