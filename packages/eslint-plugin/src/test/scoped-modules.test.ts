@@ -25,6 +25,9 @@ createTypeUnawareTester().run(RULE_NAME, RULE, {
       {messageId: 'bannedImport', line: 1},
       {messageId: 'bannedImport', line: 2},
     ]),
+    builder('exclude-test-module-in-fix/index.ts', [
+      {messageId: 'missingExports'},
+    ]),
     builder('missing-all-imports/index.ts', [{messageId: 'missingExports'}]),
     builder('missing-some-imports/index.ts', [{messageId: 'missingExports'}]),
     builder('export-namespace/1/index.ts', [
