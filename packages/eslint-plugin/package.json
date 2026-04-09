@@ -9,7 +9,7 @@
     "default": "./bld/library/index.js"
   },
   "peerDependencies": {
-    "eslint": "^10.0.0",
+    "eslint": "10",
     "typescript": "6"
   },
   "dependencies": {

@@ -1,4 +1,0 @@
-packages:
-  - packages/eslint-plugin
-publicHoistPattern:
-  - '*eslint-plugin*'

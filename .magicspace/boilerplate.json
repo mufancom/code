@@ -5,18 +5,16 @@
     "name": "mufan-code-packages",
     "license": "MIT",
     "author": "Chengdu Mufan Technology Co., Ltd.",
-    "packageManager": "pnpm",
+    "packageManager": "npm",
     "defaultBranch": "master",
     "badges": {
       "npm": true,
       "license": true,
       "discord": "https://discord.gg/vanVrDwSkS"
     },
-    "type": "module",
     "packages": [
       {
         "name": "@mufan/eslint-plugin",
-        "type": "commonjs",
         "projects": [
           {
             "name": "library"

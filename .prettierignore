@@ -1,9 +1,5 @@
 # Magicspace
 boilerplate.schema.json
 
-# Package Manager
-pnpm-lock.yaml
-/.nx/workspace-data
-
 # TypeScript Build Artifacts
 bld/
