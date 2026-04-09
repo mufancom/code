@@ -1,5 +1,5 @@
 /** @type {import('jest').Config} */
-module.exports = {
+export default {
   transform: {},
-  testMatch: ['<rootDir>/bld/test/*.test.js'],
+  testMatch: ['<rootDir>/bld/**/*.test.js'],
 };
