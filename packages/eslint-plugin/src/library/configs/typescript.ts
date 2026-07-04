@@ -11,7 +11,6 @@ const TYPESCRIPT_RULES: Linter.RulesRecord = {
   ...JAVASCRIPT_RULES,
   'no-unused-vars': 'off',
   '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
-  '@typescript-eslint/consistent-type-exports': 'error',
   '@typescript-eslint/consistent-type-imports': 'error',
   '@typescript-eslint/explicit-function-return-type': [
     'error',
