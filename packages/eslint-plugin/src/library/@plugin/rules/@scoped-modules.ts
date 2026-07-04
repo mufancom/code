@@ -113,10 +113,7 @@ export default {
       | TSESTree.ExportAllDeclaration;
 
     type ModuleStatementType =
-      | 'import'
-      | 'export-named'
-      | 'export-all'
-      | 'export-as';
+      'import' | 'export-named' | 'export-all' | 'export-as';
 
     type ModuleStatementInfo = {
       type: ModuleStatementType;
